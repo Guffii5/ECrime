@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Autofill ka background gray hi rakho */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #1f2937 inset !important; 
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+}
+
+input:focus {
+  background-color: #1f2937 !important;
+  color: #ffffff !important;
+}

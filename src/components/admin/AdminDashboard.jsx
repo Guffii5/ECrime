@@ -17,92 +17,20 @@ import { motion } from "framer-motion";
 
 export default function AdminDashboard() {
   const stats = [
-    { 
-      icon: <FileText className="w-8 h-8" />, 
-      title: 'Total Complaints', 
-      count: 120,
-      trend: '↑ 12%',
-      trendColor: 'text-red-400',
-      description: 'From last month'
-    },
-    { 
-      icon: <BarChart2 className="w-8 h-8" />, 
-      title: 'Reports Analyzed', 
-      count: 45,
-      trend: '↑ 8%',
-      trendColor: 'text-green-400',
-      description: 'AI processed reports'
-    },
-    { 
-      icon: <MapPin className="w-8 h-8" />, 
-      title: 'Police Stations', 
-      count: 18,
-      trend: '→ 0%',
-      trendColor: 'text-gray-400',
-      description: 'Active stations'
-    },
-    { 
-      icon: <ShieldCheck className="w-8 h-8" />, 
-      title: 'Resolved Cases', 
-      count: 97,
-      trend: '↑ 23%',
-      trendColor: 'text-green-400',
-      description: 'Efficiency improved'
-    },
-    { 
-      icon: <AlertCircle className="w-8 h-8" />, 
-      title: 'Pending Issues', 
-      count: 23,
-      trend: '↓ 5%',
-      trendColor: 'text-yellow-400',
-      description: 'Needs attention'
-    },
-    { 
-      icon: <Users className="w-8 h-8" />, 
-      title: 'Registered Users', 
-      count: 300,
-      trend: '↑ 15%',
-      trendColor: 'text-blue-400',
-      description: 'New signups'
-    },
+    { icon: <FileText className="w-8 h-8" />, title: 'Total Complaints', count: 120, trend: '↑ 12%', trendColor: 'text-red-400', description: 'From last month' },
+    { icon: <BarChart2 className="w-8 h-8" />, title: 'Reports Analyzed', count: 45, trend: '↑ 8%', trendColor: 'text-green-400', description: 'AI processed reports' },
+    { icon: <MapPin className="w-8 h-8" />, title: 'Police Stations', count: 18, trend: '→ 0%', trendColor: 'text-gray-400', description: 'Active stations' },
+    { icon: <ShieldCheck className="w-8 h-8" />, title: 'Resolved Cases', count: 97, trend: '↑ 23%', trendColor: 'text-green-400', description: 'Efficiency improved' },
+    { icon: <AlertCircle className="w-8 h-8" />, title: 'Pending Issues', count: 23, trend: '↓ 5%', trendColor: 'text-yellow-400', description: 'Needs attention' },
+    { icon: <Users className="w-8 h-8" />, title: 'Registered Users', count: 300, trend: '↑ 15%', trendColor: 'text-blue-400', description: 'New signups' },
   ];
 
   const activities = [
-    { 
-      id: 1,
-      type: 'alert',
-      icon: <AlertTriangle className="w-5 h-5 text-red-500" />,
-      text: "Theft reported at Main Street at 09:30 AM",
-      time: "2 mins ago"
-    },
-    { 
-      id: 2,
-      type: 'success',
-      icon: <CheckCircle2 className="w-5 h-5 text-green-500" />,
-      text: "Case #1045 marked as resolved",
-      time: "15 mins ago"
-    },
-    { 
-      id: 3,
-      type: 'warning',
-      icon: <AlertTriangle className="w-5 h-5 text-yellow-500" />,
-      text: "Suspicious activity flagged in West District",
-      time: "32 mins ago"
-    },
-    { 
-      id: 4,
-      type: 'info',
-      icon: <Activity className="w-5 h-5 text-blue-500" />,
-      text: "Patrol dispatched to Sector 12",
-      time: "1 hour ago"
-    },
-    { 
-      id: 5,
-      type: 'error',
-      icon: <AlertCircle className="w-5 h-5 text-red-400" />,
-      text: "Complaint #2012 rejected due to insufficient evidence",
-      time: "2 hours ago"
-    },
+    { id: 1, type: 'alert', icon: <AlertTriangle className="w-5 h-5 text-red-500" />, text: "Theft reported at Main Street at 09:30 AM", time: "2 mins ago" },
+    { id: 2, type: 'success', icon: <CheckCircle2 className="w-5 h-5 text-green-500" />, text: "Case #1045 marked as resolved", time: "15 mins ago" },
+    { id: 3, type: 'warning', icon: <AlertTriangle className="w-5 h-5 text-yellow-500" />, text: "Suspicious activity flagged in West District", time: "32 mins ago" },
+    { id: 4, type: 'info', icon: <Activity className="w-5 h-5 text-blue-500" />, text: "Patrol dispatched to Sector 12", time: "1 hour ago" },
+    { id: 5, type: 'error', icon: <AlertCircle className="w-5 h-5 text-red-400" />, text: "Complaint #2012 rejected due to insufficient evidence", time: "2 hours ago" },
   ];
 
   const crimeHotspots = [
@@ -114,6 +42,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <header className="mb-8 md:mb-12">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
@@ -138,6 +67,7 @@ export default function AdminDashboard() {
           </div>
         </header>
 
+        {/* Stats Cards */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
           {stats.map((item, idx) => (
             <motion.div
@@ -163,7 +93,9 @@ export default function AdminDashboard() {
           ))}
         </section>
 
+        {/* Main Sections */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 md:mb-12">
+          {/* Live Crime Heatmap */}
           <motion.div
             whileInView={{ opacity: 1, y: 0 }}
             initial={{ opacity: 0, y: 40 }}
@@ -174,29 +106,26 @@ export default function AdminDashboard() {
               <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                 <Map className="w-6 h-6 text-blue-400" /> Live Crime Heatmap
               </h2>
-              <button className="text-xs bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-full">
+              <button 
+                className="text-xs bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-full"
+                onClick={() => window.open('/heatmap-fullscreen','_blank')}
+              >
                 Fullscreen
               </button>
             </div>
-            <div className="relative">
+
+            {/* Placeholder Map */}
+            <div className="relative w-full h-64 rounded-md overflow-hidden border border-gray-600 mb-4">
               <img
-                src="https://maps.googleapis.com/maps/api/staticmap?center=24.8607,67.0011&zoom=12&size=800x400&maptype=roadmap&key=YOUR_API_KEY&style=feature:all|element:labels|visibility:off&style=feature:road|color:0x000000&style=feature:landscape|color:0x242424"
+                src="https://via.placeholder.com/800x400.png?text=Live+Crime+Heatmap+Coming+Soon"
                 alt="Map Preview"
-                className="w-full h-64 object-cover rounded-md border border-gray-600"
+                className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-red-500/10 pointer-events-none"></div>
-              <div className="absolute top-4 right-4 bg-black/70 text-white px-3 py-2 rounded-lg text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <span>High Risk</span>
-                </div>
-                <div className="flex items-center gap-2 mt-1">
-                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                  <span>Medium Risk</span>
-                </div>
-              </div>
             </div>
-            <div className="mt-4">
+
+            {/* Hotspots */}
+            <div>
               <h3 className="text-sm font-semibold mb-2">Current Hotspots</h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {crimeHotspots.map((spot, i) => (
@@ -228,6 +157,7 @@ export default function AdminDashboard() {
             </p>
           </motion.div>
 
+          {/* Recent Activity Stream */}
           <motion.div
             whileInView={{ opacity: 1, y: 0 }}
             initial={{ opacity: 0, y: 40 }}
@@ -258,9 +188,7 @@ export default function AdminDashboard() {
                   } p-3 rounded-r-lg`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5">
-                      {act.icon}
-                    </div>
+                    <div className="mt-0.5">{act.icon}</div>
                     <div className="flex-1">
                       <p className="text-sm">{act.text}</p>
                       <div className="flex items-center justify-between mt-1">
@@ -279,6 +207,7 @@ export default function AdminDashboard() {
           </motion.div>
         </section>
 
+        {/* Priority Alert */}
         <section className="mb-8 md:mb-12">
           <motion.div
             whileInView={{ opacity: 1, y: 0 }}
@@ -308,6 +237,7 @@ export default function AdminDashboard() {
           </motion.div>
         </section>
 
+        {/* Footer */}
         <footer className="text-center text-sm text-gray-500 pb-6">
           <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-6">
             <span>© {new Date().getFullYear()} Police Command Dashboard</span>

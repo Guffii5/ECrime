@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import {
-  FileText, Shield, MapPin, Search, Lightbulb, Users, Handshake,
-  ArrowRight, Smartphone, BellRing, Eye, GitPullRequest, ThumbsUp
+  FileText, Shield, MapPin, Search, Lightbulb, Users, Settings,
+  ArrowRight, Smartphone, BellRing, Eye, GitPullRequest, ThumbsUp, BarChart
 } from 'lucide-react';
+import { Link } from "react-router-dom";
 
-export default function Home() {
+export default function AdminHome() {
   const sectionPadding = "py-16 md:py-24 px-6";
   const containerClass = "max-w-7xl mx-auto";
   const headingClass = "text-4xl md:text-5xl font-extrabold text-center mb-6 md:mb-10 bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-red-600 drop-shadow-lg";
@@ -33,12 +34,14 @@ export default function Home() {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black to-gray-900 text-white overflow-hidden">
+      {/* Hero Section */}
       <section
         className="relative h-[70vh] md:h-[80vh] flex items-center justify-center text-center overflow-hidden"
         style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1542037101-ad0952a93370?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')",
+          backgroundImage: "url('/admin.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -51,26 +54,32 @@ export default function Home() {
           variants={fadeInVariants}
         >
           <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-2xl">
-            Your Safety, Our Priority.
+            Admin Dashboard
           </h1>
           <p className="text-xl md:text-2xl text-gray-200 mb-10 max-w-4xl mx-auto drop-shadow-xl">
-            Empowering communities in Punjab, Pakistan to report crimes efficiently and securely.
+            Manage crime reports, monitor danger zones, and ensure quick responses across Punjab.
           </p>
           <motion.div
-            href=""
             className={buttonClass}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            Report a Crime Now <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <Link
+              to="/admin/dashboard"
+              className="text-white font-bold text-lg hover:underline"
+            >
+              Go to Dashboard
+            </Link>
+            <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </motion.div>
         </motion.div>
       </section>
 
+      {/* Features Section */}
       <section className={`${sectionPadding} ${containerClass}`}>
-        <h2 className={headingClass}>Key Features</h2>
+        <h2 className={headingClass}>Admin Features</h2>
         <p className={paragraphClass}>
-          A seamless experience designed to connect you with law enforcement and ensure timely action.
+          Powerful tools to keep the system secure, responsive, and efficient.
         </p>
 
         <motion.div
@@ -82,223 +91,115 @@ export default function Home() {
         >
           <motion.div className={cardBgClass} variants={itemVariants}>
             <FileText className="w-12 h-12 text-red-500 mb-4 mx-auto" />
-            <h3 className="text-xl font-semibold text-white mb-3 text-center">Easy & Secure Reporting</h3>
+            <h3 className="text-xl font-semibold text-white mb-3 text-center">Manage Reports</h3>
             <p className="text-gray-300 text-center">
-              Submit detailed crime reports quickly and securely from any device. Your privacy is paramount.
+              Review, verify, and assign incoming reports to the relevant departments.
             </p>
-            
-          </motion.div>
-
-          <motion.div className={cardBgClass} variants={itemVariants}>
-            <Search className="w-12 h-12 text-red-500 mb-4 mx-auto" />
-            <h3 className="text-xl font-semibold text-white mb-3 text-center">Track Your Complaints</h3>
-            <p className="text-gray-300 text-center">
-              Monitor the real-time status of your submitted reports and receive instant updates.
-            </p>
-           
-          </motion.div>
-
-          <motion.div className={cardBgClass} variants={itemVariants}>
-            <Lightbulb className="w-12 h-12 text-red-500 mb-4 mx-auto" />
-            <h3 className="text-xl font-semibold text-white mb-3 text-center">Safety & Prevention Tips</h3>
-            <p className="text-gray-300 text-center">
-              Access valuable resources and expert advice to enhance your personal and community safety.
-            </p>
-            
           </motion.div>
 
           <motion.div className={cardBgClass} variants={itemVariants}>
             <MapPin className="w-12 h-12 text-red-500 mb-4 mx-auto" />
-            <h3 className="text-xl font-semibold text-white mb-3 text-center">Location-Based Reporting</h3>
+            <h3 className="text-xl font-semibold text-white mb-3 text-center">Monitor Danger Zones</h3>
             <p className="text-gray-300 text-center">
-              Pinpoint incident locations accurately, assisting law enforcement in rapid response.
+              Track high-risk locations and keep oversight of crime-prone areas.
             </p>
           </motion.div>
 
           <motion.div className={cardBgClass} variants={itemVariants}>
             <BellRing className="w-12 h-12 text-red-500 mb-4 mx-auto" />
-            <h3 className="text-xl font-semibold text-white mb-3 text-center">Real-time Notifications</h3>
+            <h3 className="text-xl font-semibold text-white mb-3 text-center">Instant Notifications</h3>
             <p className="text-gray-300 text-center">
-              Receive instant alerts on your report status and important safety advisories.
+              Stay updated with real-time alerts on new reports and system updates.
             </p>
-            
           </motion.div>
 
           <motion.div className={cardBgClass} variants={itemVariants}>
             <Users className="w-12 h-12 text-red-500 mb-4 mx-auto" />
-            <h3 className="text-xl font-semibold text-white mb-3 text-center">Community Engagement</h3>
+            <h3 className="text-xl font-semibold text-white mb-3 text-center">User Management</h3>
             <p className="text-gray-300 text-center">
-              Join a network of vigilant citizens contributing to a safer Punjab.
+              Manage registered users, roles, and maintain secure access.
             </p>
-            
+          </motion.div>
+
+          <motion.div className={cardBgClass} variants={itemVariants}>
+            <BarChart className="w-12 h-12 text-red-500 mb-4 mx-auto" />
+            <h3 className="text-xl font-semibold text-white mb-3 text-center">Analytics & Insights</h3>
+            <p className="text-gray-300 text-center">
+              Visualize crime data, trends, and response performance at a glance.
+            </p>
+          </motion.div>
+
+          <motion.div className={cardBgClass} variants={itemVariants}>
+            <Settings className="w-12 h-12 text-red-500 mb-4 mx-auto" />
+            <h3 className="text-xl font-semibold text-white mb-3 text-center">System Settings</h3>
+            <p className="text-gray-300 text-center">
+              Configure platform settings, permissions, and admin preferences.
+            </p>
           </motion.div>
         </motion.div>
       </section>
 
-      <section className={`${sectionPadding} ${containerClass} grid grid-cols-1 md:grid-cols-2 gap-12 items-center`}>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={fadeInVariants}
-          className="md:order-2" 
-        >
-          <h2 className={`${subHeadingClass} text-left`}>Our Mission for a Safer Punjab</h2>
-          <p className={`${paragraphClass} text-left`}>
-            At CrimeNet, we are committed to building a safer community in Punjab by bridging the gap between citizens and law enforcement. Our platform provides a modern, accessible, and confidential way to report criminal activities, contributing directly to crime prevention and rapid response. We believe that an informed and engaged community is the strongest defense against crime.
-          </p>
-          <p className={`${paragraphClass} text-left mt-4`}>
-            By empowering every resident with the tools to report and track incidents, we foster an environment of collective responsibility and proactive safety. Join us in making Punjab a secure place for everyone.
-          </p>
-        </motion.div>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={fadeInVariants}
-          className="md:order-1"
-        >
-          <img
-            src="https://images.unsplash.com/photo-1621905251917-8e682245b7f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-            alt="Community engagement for safety"
-            className="rounded-xl shadow-2xl border border-red-700/50 w-full h-auto object-cover"
-          />
-        </motion.div>
-      </section>
-
+      {/* Workflow */}
       <section className={`relative ${sectionPadding} bg-gray-900/80 backdrop-blur-sm border-y border-gray-700/50`}>
         <div className={containerClass}>
-          <h2 className={headingClass}>How It Works</h2>
+          <h2 className={headingClass}>Admin Workflow</h2>
           <p className={`${paragraphClass} mb-12`}>
-            Our simple 3-step process ensures your report reaches the right authorities quickly.
+            The streamlined process for handling crime reports efficiently.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <motion.div
-              className={`${cardBgClass} flex flex-col items-center text-center`}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={itemVariants}
-            >
-              <Smartphone className="w-14 h-14 text-red-500 mb-5 animate-pulse" />
-              <h3 className="text-2xl font-bold text-white mb-3">1. Report</h3>
-              <p className="text-gray-300">
-                Submit a detailed report online or via our mobile app. Provide all necessary information and evidence.
-              </p>
+            <motion.div className={`${cardBgClass} flex flex-col items-center text-center`} variants={itemVariants}>
+              <Smartphone className="w-14 h-14 text-red-500 mb-5" />
+              <h3 className="text-2xl font-bold text-white mb-3">1. Review</h3>
+              <p className="text-gray-300">Check all newly submitted crime reports for details and accuracy.</p>
             </motion.div>
 
-            <motion.div
-              className={`${cardBgClass} flex flex-col items-center text-center`}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={itemVariants}
-            >
-              <GitPullRequest className="w-14 h-14 text-red-500 mb-5 animate-bounce-slow" />
-              <h3 className="text-2xl font-bold text-white mb-3">2. Process</h3>
-              <p className="text-gray-300">
-                Your report is instantly forwarded to the relevant police department for verification and action.
-              </p>
+            <motion.div className={`${cardBgClass} flex flex-col items-center text-center`} variants={itemVariants}>
+              <GitPullRequest className="w-14 h-14 text-red-500 mb-5" />
+              <h3 className="text-2xl font-bold text-white mb-3">2. Assign</h3>
+              <p className="text-gray-300">Forward the reports to relevant police stations or departments.</p>
             </motion.div>
 
-            <motion.div
-              className={`${cardBgClass} flex flex-col items-center text-center`}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={itemVariants}
-            >
-              <ThumbsUp className="w-14 h-14 text-red-500 mb-5 animate-wiggle" />
+            <motion.div className={`${cardBgClass} flex flex-col items-center text-center`} variants={itemVariants}>
+              <ThumbsUp className="w-14 h-14 text-red-500 mb-5" />
               <h3 className="text-2xl font-bold text-white mb-3">3. Resolve</h3>
-              <p className="text-gray-300">
-                Track the status of your complaint and receive notifications until the case is resolved.
-              </p>
+              <p className="text-gray-300">Close reports after proper resolution and notify concerned users.</p>
             </motion.div>
           </div>
         </div>
       </section>
 
+      {/* Impact */}
       <section className={`${sectionPadding} ${containerClass}`}>
-        <h2 className={headingClass}>Our Impact in Punjab</h2>
+        <h2 className={headingClass}>Admin Impact</h2>
         <p className={`${paragraphClass} mb-12`}>
-          See how your contributions are making a tangible difference in community safety.
+          Key stats showing the effectiveness of administration.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          <motion.div
-            className={`${cardBgClass} !p-6 flex flex-col items-center justify-center`}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={itemVariants}
-          >
+          <motion.div className={`${cardBgClass} !p-6 flex flex-col items-center justify-center`} variants={itemVariants}>
             <p className="text-5xl font-extrabold text-red-500 mb-2">1,200+</p>
-            <p className="text-lg text-gray-300 text-center">Reports Filed</p>
+            <p className="text-lg text-gray-300 text-center">Reports Processed</p>
           </motion.div>
-          <motion.div
-            className={`${cardBgClass} !p-6 flex flex-col items-center justify-center`}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={itemVariants}
-          >
-            <p className="text-5xl font-extrabold text-red-500 mb-2">90%</p>
-            <p className="text-lg text-gray-300 text-center">Resolution Rate</p>
+          <motion.div className={`${cardBgClass} !p-6 flex flex-col items-center justify-center`} variants={itemVariants}>
+            <p className="text-5xl font-extrabold text-red-500 mb-2">95%</p>
+            <p className="text-lg text-gray-300 text-center">Cases Resolved</p>
           </motion.div>
-          <motion.div
-            className={`${cardBgClass} !p-6 flex flex-col items-center justify-center`}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={itemVariants}
-          >
-            <p className="text-5xl font-extrabold text-red-500 mb-2">500+</p>
-            <p className="text-lg text-gray-300 text-center">Active Users</p>
+          <motion.div className={`${cardBgClass} !p-6 flex flex-col items-center justify-center`} variants={itemVariants}>
+            <p className="text-5xl font-extrabold text-red-500 mb-2">50+</p>
+            <p className="text-lg text-gray-300 text-center">Active Admins</p>
           </motion.div>
-          <motion.div
-            className={`${cardBgClass} !p-6 flex flex-col items-center justify-center`}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={itemVariants}
-          >
+          <motion.div className={`${cardBgClass} !p-6 flex flex-col items-center justify-center`} variants={itemVariants}>
             <p className="text-5xl font-extrabold text-red-500 mb-2">24/7</p>
-            <p className="text-lg text-gray-300 text-center">Support & Monitoring</p>
+            <p className="text-lg text-gray-300 text-center">System Monitoring</p>
           </motion.div>
         </div>
       </section>
 
-      {/* Final Call to Action - Full Width */}
-      <section className="relative bg-red-800/80 ${sectionPadding} text-center overflow-hidden">
-        <div className="absolute inset-0 bg-pattern-dark opacity-10 z-0"></div> {/* Subtle pattern */}
-        <div className={`${containerClass} relative z-10`}>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight drop-shadow-xl">
-            Be the Change. Report a Crime.
-          </h2>
-          <p className="text-xl md:text-2xl text-red-100 mb-10 max-w-4xl mx-auto drop-shadow">
-            Your vigilance helps make Punjab safer for everyone. Take action today.
-          </p>
-          <motion.div
-            className={`${buttonClass} !bg-white !text-white hover:!bg-gray-200`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Start Your Report
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Footer - Full Width */}
+      {/* Footer */}
       <footer className="bg-gray-900/80 backdrop-blur-sm py-8 px-6 border-t border-gray-700/50">
         <div className={`${containerClass} text-center text-gray-400 text-sm`}>
-          <p>&copy; {new Date().getFullYear()} CrimeNet. All rights reserved.</p>
-          <p className="mt-2">Designed with <span className="text-red-500">&hearts;</span> for the community of Gujrat, Punjab, Pakistan.</p>
-          <div className="flex justify-center space-x-6 mt-4">
-            <a href="/privacy" className="hover:text-red-400 transition-colors duration-200">Privacy Policy</a>
-            <a href="/terms" className="hover:text-red-400 transition-colors duration-200">Terms of Service</a>
-            <a href="/sitemap" className="hover:text-red-400 transition-colors duration-200">Sitemap</a>
-          </div>
+          <p>&copy; {new Date().getFullYear()} CrimeNet Admin Panel. All rights reserved.</p>
         </div>
       </footer>
     </div>

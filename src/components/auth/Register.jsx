@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   User,
@@ -17,10 +18,13 @@ import {
   Instagram,
   Twitter,
   Facebook,
-  X
+  X,
+  Briefcase,
+  Building,
+  BadgeCheck
 } from 'lucide-react';
 
-const Register = ({ onRegister, onCancel }) => {
+const AdminRegister = ({ onRegister, onCancel }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -28,9 +32,9 @@ const Register = ({ onRegister, onCancel }) => {
     phone: '',
     password: '',
     confirmPassword: '',
-    role: 'citizen',
+    department: '',
+    employeeId: '',
     address: '',
-    cnic: '',
     otp: '',
     city: '',
     province: ''
@@ -44,10 +48,14 @@ const Register = ({ onRegister, onCancel }) => {
   const [isOtpVerified, setIsOtpVerified] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  const roles = [
-    { value: 'citizen', label: 'Citizen' },
-    { value: 'officer', label: 'Law Enforcement Officer' },
-    { value: 'admin', label: 'Administrator' }
+  const departments = [
+    { value: 'cyber_crime', label: 'Cyber Crime Unit' },
+    { value: 'homicide', label: 'Homicide Department' },
+    { value: 'narcotics', label: 'Narcotics Control' },
+    { value: 'traffic', label: 'Traffic Police' },
+    { value: 'forensic', label: 'Forensic Department' },
+    { value: 'administration', label: 'Administration' },
+    { value: 'investigation', label: 'Criminal Investigation' }
   ];
 
   const provinces = [
@@ -76,10 +84,11 @@ const Register = ({ onRegister, onCancel }) => {
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    if (!formData.cnic.trim()) {
-      newErrors.cnic = 'CNIC is required';
-    } else if (!/^\d{5}-\d{7}-\d{1}$/.test(formData.cnic)) {
-      newErrors.cnic = 'Invalid CNIC format (XXXXX-XXXXXXX-X)';
+    if (!formData.employeeId.trim()) {
+      newErrors.employeeId = 'Employee ID is required';
+    }
+    if (!formData.department.trim()) {
+      newErrors.department = 'Department is required';
     }
     if (showOtpField && !formData.otp.trim()) {
       newErrors.otp = 'OTP is required';
@@ -117,7 +126,7 @@ const Register = ({ onRegister, onCancel }) => {
   };
 
   const handleVerifyOtp = () => {
-    if (formData.otp.trim().length === 6) { // Mock OTP length check
+    if (formData.otp.trim().length === 6) {
       setIsOtpVerified(true);
       alert('OTP verified successfully!');
     } else {
@@ -152,9 +161,9 @@ const Register = ({ onRegister, onCancel }) => {
         phone: '',
         password: '',
         confirmPassword: '',
-        role: 'citizen',
+        department: '',
+        employeeId: '',
         address: '',
-        cnic: '',
         otp: '',
         city: '',
         province: ''
@@ -192,41 +201,20 @@ const Register = ({ onRegister, onCancel }) => {
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-4xl font-bold text-red-400 flex items-center gap-3">
             <Shield className="w-10 h-10 text-red-500" />
-            Join CrimePortal
+            Admin Registration
           </h2>
-          <motion.button
-            onClick={onCancel}
-            className="text-gray-300 hover:text-red-400 transition-colors"
-            aria-label="Close"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <XCircle className="w-8 h-8" />
-          </motion.button>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+            <Link
+              to="/login"
+              className="text-gray-300 hover:text-red-400 transition-colors"
+              aria-label="Close"
+            >
+              <XCircle className="w-8 h-8" />
+            </Link>
+          </motion.div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Account Type */}
-          <div className="group">
-            <label htmlFor="role" className={labelClass}>
-              <Shield className={iconClass} /> Account Type *
-            </label>
-            <motion.select
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className={inputClass}
-              whileFocus={{ scale: 1.02, boxShadow: '0 0 8px rgba(239, 68, 68, 0.3)' }}
-            >
-              {roles.map(role => (
-                <option key={role.value} value={role.value}>
-                  {role.label}
-                </option>
-              ))}
-            </motion.select>
-          </div>
-
           {/* First Name & Last Name */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="group">
@@ -271,6 +259,55 @@ const Register = ({ onRegister, onCancel }) => {
             </div>
           </div>
 
+          {/* Department & Employee ID */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="group">
+              <label htmlFor="department" className={labelClass}>
+                <Building className={iconClass} /> Department *
+              </label>
+              <motion.select
+                id="department"
+                name="department"
+                value={formData.department}
+                onChange={handleChange}
+                className={`${inputClass} ${errors.department ? 'border-red-600' : ''}`}
+                whileFocus={{ scale: 1.02, boxShadow: '0 0 8px rgba(239, 68, 68, 0.3)' }}
+              >
+                <option value="">Select Department</option>
+                {departments.map(dept => (
+                  <option key={dept.value} value={dept.value}>
+                    {dept.label}
+                  </option>
+                ))}
+              </motion.select>
+              {errors.department && (
+                <p className={errorClass}>
+                  <XCircle className="w-4 h-4" /> {errors.department}
+                </p>
+              )}
+            </div>
+            <div className="group">
+              <label htmlFor="employeeId" className={labelClass}>
+                <BadgeCheck className={iconClass} /> Employee ID *
+              </label>
+              <motion.input
+                type="text"
+                id="employeeId"
+                name="employeeId"
+                value={formData.employeeId}
+                onChange={handleChange}
+                className={`${inputClass} ${errors.employeeId ? 'border-red-600' : ''}`}
+                placeholder="EMP-12345"
+                whileFocus={{ scale: 1.02, boxShadow: '0 0 8px rgba(239, 68, 68, 0.3)' }}
+              />
+              {errors.employeeId && (
+                <p className={errorClass}>
+                  <XCircle className="w-4 h-4" /> {errors.employeeId}
+                </p>
+              )}
+            </div>
+          </div>
+
           {/* Email & OTP */}
           <div className="bg-gray-950/50 p-5 rounded-2xl border border-gray-700/30 shadow-inner">
             <div className="group">
@@ -285,7 +322,7 @@ const Register = ({ onRegister, onCancel }) => {
                   value={formData.email}
                   onChange={handleChange}
                   className={`${inputClass} flex-grow ${errors.email ? 'border-red-600' : ''}`}
-                  placeholder="your@email.com"
+                  placeholder="admin@crimeportal.gov.pk"
                   disabled={isOtpVerified}
                   whileFocus={{ scale: 1.02, boxShadow: '0 0 8px rgba(239, 68, 68, 0.3)' }}
                 />
@@ -347,43 +384,21 @@ const Register = ({ onRegister, onCancel }) => {
             )}
           </div>
 
-          {/* Phone Number & CNIC */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="group">
-              <label htmlFor="phone" className={labelClass}>
-                <Phone className={iconClass} /> Phone Number
-              </label>
-              <motion.input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className={inputClass}
-                placeholder="+92 123 456 7890"
-                whileFocus={{ scale: 1.02, boxShadow: '0 0 8px rgba(239, 68, 68, 0.3)' }}
-              />
-            </div>
-            <div className="group">
-              <label htmlFor="cnic" className={labelClass}>
-                <CreditCard className={iconClass} /> CNIC *
-              </label>
-              <motion.input
-                type="text"
-                id="cnic"
-                name="cnic"
-                value={formData.cnic}
-                onChange={handleChange}
-                className={`${inputClass} ${errors.cnic ? 'border-red-600' : ''}`}
-                placeholder="XXXXX-XXXXXXX-X"
-                whileFocus={{ scale: 1.02, boxShadow: '0 0 8px rgba(239, 68, 68, 0.3)' }}
-              />
-              {errors.cnic && (
-                <p className={errorClass}>
-                  <XCircle className="w-4 h-4" /> {errors.cnic}
-                </p>
-              )}
-            </div>
+          {/* Phone Number */}
+          <div className="group">
+            <label htmlFor="phone" className={labelClass}>
+              <Phone className={iconClass} /> Phone Number
+            </label>
+            <motion.input
+              type="tel"
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              className={inputClass}
+              placeholder="+92 123 456 7890"
+              whileFocus={{ scale: 1.02, boxShadow: '0 0 8px rgba(239, 68, 68, 0.3)' }}
+            />
           </div>
 
           {/* Password & Confirm Password */}
@@ -535,11 +550,11 @@ const Register = ({ onRegister, onCancel }) => {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Creating Account...
+                  Creating Admin Account...
                 </>
               ) : (
                 <>
-                  <CheckCircle className="w-6 h-6" /> Register Now
+                  <CheckCircle className="w-6 h-6" /> Register Admin
                 </>
               )}
             </motion.button>
@@ -581,10 +596,10 @@ const Register = ({ onRegister, onCancel }) => {
                 className="bg-gray-900 p-8 rounded-2xl border border-red-600/50 max-w-md w-full shadow-2xl"
               >
                 <h3 className="text-2xl font-bold text-red-400 mb-4 flex items-center gap-2">
-                  <CheckCircle className="w-6 h-6" /> Registration Successful!
+                  <CheckCircle className="w-6 h-6" /> Admin Registration Successful!
                 </h3>
                 <p className="text-gray-300 mb-6">
-                  Your account has been created. Please check your email for verification.
+                  Your admin account has been created. Please check your email for verification.
                 </p>
                 <motion.button
                   onClick={closeModal}
@@ -619,4 +634,4 @@ const Register = ({ onRegister, onCancel }) => {
   );
 };
 
-export default Register;
+export default AdminRegister;
