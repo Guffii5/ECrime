@@ -17,13 +17,12 @@ import Resources from "./components/user/Resources";
 import MyReports from "./components/user/Myreports";
 import ReportDetail from "./components/user/Reportdetails";
 import CrimeByCity from "./components/user/CrimeBycity";
-import Footer from "./components/user/Footer"; 
+import Footer from "./components/user/Footer";
+import Feedback from "./components/user/feedback"; 
 
-// Wrapper for layout handling Footer visibility
 function Layout({ children }) {
   const location = useLocation();
 
-  // Paths where footer should NOT appear
   const noFooterPaths = ["/login", "/register", "/forgotpassword", "/otp"];
 
   const hideFooter = noFooterPaths.some((path) =>
@@ -50,7 +49,7 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/forgotpassword" element={<ForgotPassword />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/otp" element={<h1>OTP Page</h1>} /> 
+            <Route path="/otp" element={<h1>OTP Page</h1>} />
 
             {/* User Routes */}
             <Route path="/user/dashboard" element={<UserDashboard />} />
@@ -64,6 +63,7 @@ export default function App() {
             <Route path="/user/resources" element={<Resources />} />
             <Route path="/user/CrimeBycity" element={<CrimeByCity />} />
             <Route path="/user/myReports/:id" element={<ReportDetail />} />
+            <Route path="/user/feedback" element={<Feedback />} />
 
             {/* Fallback Route */}
             <Route

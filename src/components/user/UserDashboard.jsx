@@ -17,10 +17,10 @@ const actions = [
     link: "/user/SafetyTips"
   },
   {
-    icon: <HelpCircle className="w-6 h-6 text-red-400" />,
-    title: "Track Complaints",
-    description: "Monitor your reports",
-    link: "/user/track"
+    icon: <MessageSquare className="w-6 h-6 text-red-400" />, 
+    title: "Feedback",
+    description: "Share feedback",
+    link: "/user/feedback" 
   },
   {
     icon: <MapPin className="w-6 h-6 text-red-400" />,
@@ -29,9 +29,9 @@ const actions = [
     link: "/user/CrimeBycity"
   },
   {
-    icon: <MessageSquare className="w-6 h-6 text-red-400" />,
-    title: "FAQS",
-    description: "Frequently Asking Questions",
+    icon: <HelpCircle className="w-6 h-6 text-red-400" />, // ✅ Changed icon
+    title: "FAQs",
+    description: "Frequently Asked Questions",
     link: "/user/faqs",
     urgent: true
   },
