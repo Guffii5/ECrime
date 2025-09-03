@@ -6,6 +6,8 @@ export default function ReportCrime() {
   const [form, setForm] = useState({
     name: "",
     location: "",
+    city: "",
+    address: "",
     time: "",
     details: "",
     emergency: false,
@@ -24,7 +26,7 @@ export default function ReportCrime() {
   const [isDragging, setIsDragging] = useState(false);
   const [complaintNumber, setComplaintNumber] = useState(null);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [popupType, setPopupType] = useState(""); // "media" or "report"
+  const [popupType, setPopupType] = useState("");
   const fileInputRef = useRef(null);
 
   const crimeTypes = [
@@ -36,20 +38,44 @@ export default function ReportCrime() {
     { value: "other", label: "Other" }
   ];
 
+  const punjabCities = [
+    "Lahore", "Faisalabad", "Rawalpindi", "Multan", "Gujranwala",
+    "Sialkot", "Bahawalpur", "Sargodha", "Jhang", "Sheikhupura",
+    "Rahim Yar Khan", "Gujrat", "Kasur", "Sahiwal", "Okara",
+    "Mianwali", "Chiniot", "Kamoke", "Hafizabad", "Attock",
+    "Wah Cantonment", "Jhelum", "Khanewal", "Muzaffargarh", "Burewala"
+  ];
+
   const validateField = (name, value) => {
     let error = "";
-    if (name === "name" && !form.anonymous && !value.trim()) error = "Name is required unless anonymous";
-    if (name === "location" && !value.trim()) error = "Location is required";
+
+    if (name === "name" && !form.anonymous) {
+      if (!value.trim()) {
+        error = "Name is required unless anonymous";
+      } else if (!/^[A-Za-z\s]+$/.test(value)) {
+        error = "Name should contain only alphabets";
+      }
+    }
+
+    if (name === "city" && !value) error = "City is required";
+    if (name === "address" && !value.trim()) error = "Address details are required";
     if (name === "time" && !value) error = "Time is required";
     if (name === "details" && !value.trim()) error = "Details are required";
     if (name === "crimeType" && !value) error = "Crime type is required";
     if (name === "otherCrimeType" && form.crimeType === "other" && !value.trim()) error = "Please specify the crime type";
+
     return error;
   };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === "checkbox" ? checked : value;
+
+    // Validate name field to only accept alphabets
+    if (name === "name" && !form.anonymous && newValue !== "" && !/^[A-Za-z\s]*$/.test(newValue)) {
+      return;
+    }
+
     setForm({ ...form, [name]: newValue });
 
     const error = validateField(name, newValue);
@@ -58,18 +84,18 @@ export default function ReportCrime() {
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const validFiles = files.filter(file => 
-      (file.type.startsWith('image/') || file.type.startsWith('video/')) && 
+    const validFiles = files.filter(file =>
+      (file.type.startsWith('image/') || file.type.startsWith('video/')) &&
       file.size <= 30 * 1024 * 1024 // 30MB limit
     );
-    
+
     if (validFiles.length > 0) {
       setMediaFiles([...mediaFiles, ...validFiles]);
-      
+
       // Show media upload success popup
       setPopupType("media");
       setShowSuccessPopup(true);
-      
+
       // Auto-hide popup after 5 seconds
       setTimeout(() => {
         setShowSuccessPopup(false);
@@ -88,7 +114,10 @@ export default function ReportCrime() {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          setForm(prev => ({ ...prev, location: `Lat: ${latitude}, Lon: ${longitude}` }));
+          setForm(prev => ({
+            ...prev,
+            location: `Lat: ${latitude.toFixed(6)}, Lon: ${longitude.toFixed(6)}`
+          }));
           setErrors(prev => ({ ...prev, location: "" }));
         },
         () => {
@@ -109,11 +138,11 @@ export default function ReportCrime() {
         clearInterval(interval);
         setTimeout(() => {
           setSubmitted(true);
-          
+
           // Generate final complaint number on form submission
           const finalComplaintNumber = "CR-" + Math.floor(100000 + Math.random() * 900000);
           setComplaintNumber(finalComplaintNumber);
-          
+
           // Show report submission success popup
           setPopupType("report");
           setShowSuccessPopup(true);
@@ -127,7 +156,7 @@ export default function ReportCrime() {
     e.preventDefault();
     const newErrors = {};
     Object.keys(form).forEach(key => {
-      if (key !== "severity" && key !== "anonymous" && key !== "emergency" && key !== "otherCrimeType") {
+      if (key !== "severity" && key !== "anonymous" && key !== "emergency" && key !== "otherCrimeType" && key !== "location") {
         const error = validateField(key, form[key]);
         if (error) newErrors[key] = error;
       }
@@ -249,11 +278,13 @@ export default function ReportCrime() {
                       <input
                         type="text"
                         name="name"
-                        placeholder="Your Name"
+                        placeholder="Your Name (Alphabets only)"
                         value={form.name}
                         onChange={handleChange}
                         className={inputClass}
                         required={!form.anonymous}
+                        pattern="[A-Za-z\s]+"
+                        title="Name should contain only alphabets"
                       />
                       {form.name && !errors.name && <CheckCircle className="w-4 h-4 text-green-400" />}
                       {errors.name && <AlertCircle className="w-4 h-4 text-red-400" />}
@@ -312,24 +343,67 @@ export default function ReportCrime() {
                     </p>
                   )}
 
-                  {/* Location */}
+                  {/* City Selection */}
+                  <div className={containerClass}>
+                    <MapPin className="text-gray-400 flex-shrink-0" />
+                    <select
+                      name="city"
+                      value={form.city}
+                      onChange={handleChange}
+                      className={`${inputClass} bg-gray-900 text-white appearance-none pr-8`}
+                      required
+                      style={{ color: form.city ? 'white' : '#9CA3AF' }}
+                    >
+                      <option value="" className="text-gray-500 bg-gray-900">Select City in Punjab</option>
+                      {punjabCities.map(city => (
+                        <option key={city} value={city} className="text-white bg-gray-900">{city}</option>
+                      ))}
+                    </select>
+                    {form.city && !errors.city && <CheckCircle className="w-4 h-4 text-green-400" />}
+                    {errors.city && <AlertCircle className="w-4 h-4 text-red-400" />}
+                  </div>
+                  {errors.city && (
+                    <p className={errorClass}>
+                      <AlertCircle className="w-4 h-4" /> {errors.city}
+                    </p>
+                  )}
+
+                  {/* Address Details */}
+                  <div className={containerClass}>
+                    <MapPin className="text-gray-400 flex-shrink-0" />
+                    <input
+                      type="text"
+                      name="address"
+                      placeholder="Address Details (e.g., Muslim Abad, Street #, House #)"
+                      value={form.address}
+                      onChange={handleChange}
+                      className={inputClass}
+                      required
+                    />
+                    {form.address && !errors.address && <CheckCircle className="w-4 h-4 text-green-400" />}
+                    {errors.address && <AlertCircle className="w-4 h-4 text-red-400" />}
+                  </div>
+                  {errors.address && (
+                    <p className={errorClass}>
+                      <AlertCircle className="w-4 h-4" /> {errors.address}
+                    </p>
+                  )}
+
+                  {/* Location Coordinates */}
                   <div className={containerClass}>
                     <MapPin className="text-gray-400 flex-shrink-0" />
                     <input
                       type="text"
                       name="location"
-                      placeholder="Crime Location"
+                      placeholder="Coordinates (Auto-filled or manual)"
                       value={form.location}
                       onChange={handleChange}
                       className={inputClass}
-                      required
                     />
-                    {form.location && !errors.location && <CheckCircle className="w-4 h-4 text-green-400" />}
-                    {errors.location && <AlertCircle className="w-4 h-4 text-red-400" />}
                     <motion.button
                       type="button"
                       onClick={handleGetLocation}
-                      className="px-2 py-1 bg-red-600 rounded-lg text-xs"
+                      className="px-2 py-1 bg-red-600 rounded-lg text-xs whitespace-nowrap"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -499,7 +573,9 @@ export default function ReportCrime() {
                 <div className="bg-gray-900/50 p-4 rounded-xl border border-gray-700">
                   <p><strong>Crime Type:</strong> {form.crimeType === "other" ? form.otherCrimeType : crimeTypes.find(type => type.value === form.crimeType)?.label}</p>
                   <p><strong>Name:</strong> {form.anonymous ? "Anonymous" : form.name || "Not provided"}</p>
-                  <p><strong>Location:</strong> {form.location}</p>
+                  <p><strong>City:</strong> {form.city}</p>
+                  <p><strong>Address:</strong> {form.address}</p>
+                  <p><strong>Coordinates:</strong> {form.location || "Not provided"}</p>
                   <p><strong>Time:</strong> {new Date(form.time).toLocaleString()}</p>
                   <p><strong>Details:</strong> {form.details}</p>
                   <p><strong>Severity:</strong> {form.severity}/10</p>
@@ -526,7 +602,7 @@ export default function ReportCrime() {
                   type="button"
                   onClick={() => {
                     const newErrors = {};
-                    const fieldsToValidate = step === 1 ? ["name", "location", "time", "details", "crimeType", "otherCrimeType"] : [];
+                    const fieldsToValidate = step === 1 ? ["name", "city", "address", "time", "details", "crimeType", "otherCrimeType"] : [];
                     fieldsToValidate.forEach(key => {
                       const error = validateField(key, form[key]);
                       if (error) newErrors[key] = error;
@@ -648,13 +724,13 @@ export default function ReportCrime() {
                     {popupType === "media" ? "Media Uploaded!" : "Report Submitted!"}
                   </h3>
                 </div>
-                
+
                 <p className="text-gray-300 mb-2">
-                  {popupType === "media" 
-                    ? "Your media files have been uploaded successfully." 
+                  {popupType === "media"
+                    ? "Your media files have been uploaded successfully."
                     : "Your crime report has been submitted successfully."}
                 </p>
-                
+
                 {popupType === "report" && complaintNumber && (
                   <div className="bg-gray-900 p-4 rounded-lg mb-4">
                     <p className="text-gray-400 text-sm mb-1">Your complaint reference number:</p>
@@ -669,13 +745,13 @@ export default function ReportCrime() {
                     </div>
                   </div>
                 )}
-                
+
                 <p className="text-gray-400 text-sm mb-4">
-                  {popupType === "media" 
-                    ? "You can now proceed to submit your report." 
+                  {popupType === "media"
+                    ? "You can now proceed to submit your report."
                     : "Please save this number for future reference. You can use it to track the status of your report."}
                 </p>
-                
+
                 <div className="flex justify-end">
                   <button
                     onClick={() => setShowSuccessPopup(false)}
