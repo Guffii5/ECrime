@@ -11,9 +11,11 @@ import AdminSettings from "./components/admin/AdminSetting";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ForgotPassword from "./components/auth/forgotpassword";
 import User from "./components/admin/User"; 
+import CrimeByCity from "./components/admin/CrimeByCity"; 
+import Feedback from "./components/admin/feedback"; 
 
 function Layout() {
-  const role = localStorage.getItem("role"); // Check if user is logged in
+  const role = localStorage.getItem("role"); 
 
   return (
     <div className="flex min-h-screen bg-gray-900">
@@ -47,7 +49,7 @@ export default function App() {
         {/* Layout for pages (sidebar shows only if logged in) */}
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} /> {/* Default home page visible to all */}
-          
+
           {/* Protected Routes */}
           <Route
             path="/admin/dashboard"
@@ -94,6 +96,22 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <User />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/feedback"
+            element={
+              <ProtectedRoute>
+                <Feedback />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/crime-by-city"
+            element={
+              <ProtectedRoute>
+                <CrimeByCity />
               </ProtectedRoute>
             }
           />

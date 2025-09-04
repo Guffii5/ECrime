@@ -1,1033 +1,873 @@
 import React, { useState, useEffect } from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
-import { motion, AnimatePresence } from "framer-motion";
 import {
-  BarChart3,
-  PieChart as PieIcon,
-  LineChart,
-  Filter,
-  Download,
-  AlertTriangle,
-  Calendar,
-  MapPin,
-  ChevronDown,
-  ChevronUp,
-  UserPlus,
+  Bell,
+  Trash2,
   User,
-  ShieldAlert,
-  Clock,
+  Calendar,
+  CheckCircle2,
+  AlertTriangle,
+  ClipboardList,
   Eye,
+  MapPin,
+  Clock,
   FileText,
   Image,
   Video,
-  Map,
-  Calendar as CalendarIcon,
-  Clock as ClockIcon,
-  AlertCircle,
-  MessageSquare,
   X,
-  CheckCircle,
-  Search,
-  ChevronLeft,
-  ChevronRight,
   Send,
-  Bell,
-  Megaphone
+  UserCheck,
+  Map,
+  Search,
+  Filter,
+  BarChart3,
+  ChevronDown,
+  ChevronUp,
+  MessageSquare,
+  Megaphone,
+  Shield,
+  AlertCircle
 } from "lucide-react";
 
-// Enhanced data with more complaint details
-const generateComplaints = () => {
-  const types = ["Theft", "Assault", "Fraud", "Noise Complaint", "Vandalism", "Harassment", "Suspicious Activity", "Drugs", "Trespassing", "Dispute"];
-  const locations = ["Downtown", "City Park", "University Area", "Residential Block B", "Online", "Industrial Zone", "Alleyway", "Workplace", "Central Market", "Shopping District"];
-  const times = ["2:30 PM", "11:45 AM", "9:15 PM", "1:20 AM", "4:45 PM", "8:30 PM", "3:15 AM", "2:00 PM", "6:45 PM", "10:30 PM"];
+export default function ManageComplaints() {
+  // Dummy 50 complaints with different statuses and additional details
+  const dummyComplaints = Array.from({ length: 50 }, (_, i) => ({
+    id: i + 1,
+    name: `User ${i + 1}`,
+    date: new Date(Date.now() - i * 86400000).toLocaleDateString(),
+    time: new Date(Date.now() - i * 86400000).toLocaleTimeString(),
+    description: `Complaint description for issue #${i + 1}. This is a more detailed description of the problem reported by the user.`,
+    status: i % 4 === 0 ? "Incoming" : i % 4 === 1 ? "Assigned" : i % 4 === 2 ? "Pending" : "Resolved",
+    city: i % 3 === 0 ? "New York" : i % 3 === 1 ? "Los Angeles" : "Chicago",
+    location: i % 2 === 0 ? "Downtown" : "Suburban",
+    anonymous: i % 5 === 0,
+    images: i % 4 === 0 ? ["https://via.placeholder.com/400x300?text=Evidence+1"] : [],
+    videos: i % 6 === 0 ? ["https://via.placeholder.com/400x300?text=Video+Evidence"] : [],
+    assignedTo: i % 4 === 1 ? `Officer ${i % 5 + 1}` : "",
+    assignedDate: i % 4 === 1 ? new Date(Date.now() - i * 43200000).toLocaleDateString() : "",
+    priority: ["Low", "Medium", "High", "Critical"][Math.floor(Math.random() * 4)],
+    type: ["Theft", "Assault", "Vandalism", "Noise", "Harassment"][Math.floor(Math.random() * 5)],
+    investigationTime: i % 3 === 0 ? "2 hours" : i % 3 === 1 ? "1 day" : "3 days"
+  }));
 
-  const complaints = [];
-
-  for (let i = 1; i <= 50; i++) {
-    const type = types[Math.floor(Math.random() * types.length)];
-    const location = locations[Math.floor(Math.random() * locations.length)];
-    const time = times[Math.floor(Math.random() * times.length)];
-    const anonymous = Math.random() > 0.5;
-
-    let media = [];
-    if (Math.random() > 0.6) {
-      const mediaTypes = ["image", "video", "document"];
-      const mediaCount = Math.floor(Math.random() * 3) + 1;
-      for (let j = 0; j < mediaCount; j++) {
-        const mediaType = mediaTypes[Math.floor(Math.random() * mediaTypes.length)];
-        if (mediaType === "image") media.push(`image${Math.floor(Math.random() * 5) + 1}.jpg`);
-        if (mediaType === "video") media.push(`video${Math.floor(Math.random() * 3) + 1}.mp4`);
-        if (mediaType === "document") media.push(`document${Math.floor(Math.random() * 2) + 1}.txt`);
-      }
-    }
-
-    complaints.push({
-      id: i + 1000,
-      type,
-      location,
-      time,
-      description: `This is a detailed description of the ${type.toLowerCase()} incident that occurred at ${location} around ${time}. The complainant reported specific details about the situation that require investigation.`,
-      anonymous,
-      media,
-      status: Math.random() > 0.7 ? "Resolved" : "Pending",
-      date: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toLocaleDateString(),
-      priority: ["Low", "Medium", "High", "Critical"][Math.floor(Math.random() * 4)]
-    });
-  }
-
-  return complaints;
-};
-
-const allComplaints = generateComplaints();
-
-// Group complaints by month for the chart
-const complaintsData = [
-  {
-    id: 1,
-    name: "Jan",
-    complaints: 12,
-    resolved: 8,
-    anonymous: 4,
-    details: allComplaints.slice(0, 2)
-  },
-  {
-    id: 2,
-    name: "Feb",
-    complaints: 18,
-    resolved: 12,
-    anonymous: 7,
-    details: allComplaints.slice(2, 4)
-  },
-  {
-    id: 3,
-    name: "Mar",
-    complaints: 22,
-    resolved: 15,
-    anonymous: 9,
-    details: allComplaints.slice(4, 6)
-  },
-  {
-    id: 4,
-    name: "Apr",
-    complaints: 15,
-    resolved: 10,
-    anonymous: 5,
-    details: allComplaints.slice(6, 8)
-  },
-  {
-    id: 5,
-    name: "May",
-    complaints: 27,
-    resolved: 18,
-    anonymous: 9,
-    details: allComplaints.slice(8, 10)
-  },
-  {
-    id: 6,
-    name: "Jun",
-    complaints: 34,
-    resolved: 22,
-    anonymous: 12,
-    details: allComplaints.slice(10, 12)
-  },
-];
-
-const complaintTypeData = [
-  { name: "Theft", value: 42, color: "#e11d48", priority: "High", avgResolution: "2 days" },
-  { name: "Assault", value: 23, color: "#f97316", priority: "Critical", avgResolution: "5 days" },
-  { name: "Fraud", value: 18, color: "#3b82f6", priority: "Medium", avgResolution: "7 days" },
-  { name: "Noise", value: 12, color: "#10b981", priority: "Low", avgResolution: "1 day" },
-  { name: "Vandalism", value: 5, color: "#8b5cf6", priority: "Medium", avgResolution: "3 days" },
-];
-
-const locationData = [
-  { name: "Downtown Area", complaints: 24, trend: "up", priority: "High", commonTypes: ["Theft", "Vandalism"] },
-  { name: "Industrial Zone", complaints: 15, trend: "up", priority: "Medium", commonTypes: ["Suspicious Activity", "Trespassing"] },
-  { name: "University District", complaints: 8, trend: "down", priority: "Medium", commonTypes: ["Noise", "Harassment"] },
-  { name: "Central Market", complaints: 18, trend: "up", priority: "High", commonTypes: ["Theft", "Fraud"] },
-  { name: "Residential Block A", complaints: 6, trend: "stable", priority: "Low", commonTypes: ["Noise", "Dispute"] },
-];
-
-export default function ComplaintsDashboard() {
-  const [timeRange, setTimeRange] = useState("monthly");
-  const [complaintTypeFilter, setComplaintTypeFilter] = useState("all");
-  const [expandedSection, setExpandedSection] = useState(null);
-  const [selectedComplaint, setSelectedComplaint] = useState(null);
-  const [viewMode, setViewMode] = useState("overview"); // overview, details, allComplaints, assignInvestigator
-  const [resolvedPopup, setResolvedPopup] = useState(false);
-  const [assignPopup, setAssignPopup] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [complaints, setComplaints] = useState(dummyComplaints);
+  const [activeTab, setActiveTab] = useState("Incoming");
   const [currentPage, setCurrentPage] = useState(1);
-  const [investigationTime, setInvestigationTime] = useState("");
   const [notifications, setNotifications] = useState([]);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [newComplaintCount, setNewComplaintCount] = useState(0);
-  const complaintsPerPage = 10;
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showResolvedModal, setShowResolvedModal] = useState(false);
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [assignForm, setAssignForm] = useState({
+    officer: "",
+    deadline: "",
+    instructions: "",
+    arrivalTime: ""
+  });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState("All");
+  const [showNotificationsPanel, setShowNotificationsPanel] = useState(false);
 
-  // Simulate new complaints being added
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // 20% chance of a new complaint every 10 seconds
-      if (Math.random() < 0.2) {
-        const types = ["Theft", "Assault", "Fraud", "Noise Complaint", "Vandalism"];
-        const locations = ["Downtown", "City Park", "University Area", "Residential Block B", "Shopping District"];
+  const complaintsPerPage = 9;
+  const officers = ["Officer Salman", "Officer Maham", "Officer Rameen"];
 
-        const newComplaint = {
-          id: Math.floor(Math.random() * 10000) + 2000,
-          type: types[Math.floor(Math.random() * types.length)],
-          location: locations[Math.floor(Math.random() * locations.length)],
-          time: new Date().toLocaleTimeString(),
-          description: "New complaint registered through mobile app",
-          anonymous: Math.random() > 0.5,
-          media: [],
-          status: "Pending",
-          date: new Date().toLocaleDateString(),
-          priority: ["Low", "Medium", "High"][Math.floor(Math.random() * 3)]
-        };
-
-        setNotifications(prev => [
-          {
-            id: Date.now(),
-            message: `New ${newComplaint.type} complaint reported at ${newComplaint.location}`,
-            type: "new_complaint",
-            complaint: newComplaint,
-            time: new Date().toLocaleTimeString(),
-            read: false
-          },
-          ...prev.slice(0, 9) // Keep only last 10 notifications
-        ]);
-
-        setNewComplaintCount(prev => prev + 1);
-
-        // Auto-hide notification badge after 5 seconds
-        setTimeout(() => {
-          setNewComplaintCount(prev => Math.max(0, prev - 1));
-        }, 5000);
-      }
-    }, 10000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const toggleSection = (section) => {
-    setExpandedSection(expandedSection === section ? null : section);
-  };
-
-  const viewComplaintDetails = (complaint) => {
-    setSelectedComplaint(complaint);
-    setViewMode("details");
-  };
-
-  const closeComplaintDetails = () => {
-    setSelectedComplaint(null);
-    setViewMode("overview");
-  };
-
-  const viewAllComplaints = () => {
-    setViewMode("allComplaints");
-  };
-
-  const markAsResolved = () => {
-    if (selectedComplaint) {
-      setResolvedPopup(true);
-      setTimeout(() => {
-        setResolvedPopup(false);
-        closeComplaintDetails();
-      }, 2000);
-    }
-  };
-
-  const assignInvestigator = () => {
-    setViewMode("assignInvestigator");
-  };
-
-  const sendInvestigationNotification = () => {
-    if (investigationTime) {
-      setAssignPopup(true);
-      setTimeout(() => {
-        setAssignPopup(false);
-        setViewMode("details");
-        setInvestigationTime("");
-      }, 2000);
-    }
-  };
-
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case "Critical": return "bg-red-900/50 text-red-400";
-      case "High": return "bg-orange-900/50 text-orange-400";
-      case "Medium": return "bg-yellow-900/50 text-yellow-400";
-      case "Low": return "bg-green-900/50 text-green-400";
-      default: return "bg-gray-700 text-gray-400";
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Resolved": return "bg-green-900/50 text-green-400";
-      case "Pending": return "bg-yellow-900/50 text-yellow-400";
-      case "Investigating": return "bg-blue-900/50 text-blue-400";
-      default: return "bg-gray-700 text-gray-400";
-    }
-  };
-
-  // Filter complaints based on search term
-  const filteredComplaints = allComplaints.filter(complaint =>
-    complaint.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    complaint.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    complaint.description.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter complaints based on active tab and search term
+  const filteredComplaints = complaints.filter((c) =>
+    c.status === activeTab &&
+    (c.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.city.toLowerCase().includes(searchTerm.toLowerCase())) &&
+    (priorityFilter === "All" || c.priority === priorityFilter)
   );
 
   // Pagination
-  const indexOfLastComplaint = currentPage * complaintsPerPage;
-  const indexOfFirstComplaint = indexOfLastComplaint - complaintsPerPage;
-  const currentComplaints = filteredComplaints.slice(indexOfFirstComplaint, indexOfLastComplaint);
   const totalPages = Math.ceil(filteredComplaints.length / complaintsPerPage);
+  const startIndex = (currentPage - 1) * complaintsPerPage;
+  const currentComplaints = filteredComplaints.slice(startIndex, startIndex + complaintsPerPage);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  // Mark notifications as read
-  const markAsRead = (id) => {
-    setNotifications(prev =>
-      prev.map(notification =>
-        notification.id === id ? { ...notification, read: true } : notification
-      )
+  // Handle status change
+  const updateStatus = (id, newStatus) => {
+    const updatedComplaints = complaints.map((c) =>
+      c.id === id ? { ...c, status: newStatus } : c
     );
+
+    setComplaints(updatedComplaints);
+
+    // Show notification for status change
+    const complaint = complaints.find(c => c.id === id);
+    if (complaint) {
+      if (newStatus === "Resolved") {
+        setShowResolvedModal(true);
+        setTimeout(() => setShowResolvedModal(false), 3000);
+      }
+
+      // Add notification
+      setNotifications(prev => [
+        {
+          id: Date.now(),
+          message: `Complaint #${id} status changed to ${newStatus}`,
+          type: "status_change",
+          time: new Date().toLocaleTimeString(),
+          read: false
+        },
+        ...prev
+      ]);
+    }
+  };
+
+  // Handle delete
+  const deleteComplaint = (id) => {
+    setComplaints((prev) => prev.filter((c) => c.id !== id));
+    setShowDeleteModal(false);
+
+    // Add notification
+    setNotifications(prev => [
+      {
+        id: Date.now(),
+        message: `Complaint #${id} has been deleted`,
+        type: "deletion",
+        time: new Date().toLocaleTimeString(),
+        read: false
+      },
+      ...prev
+    ]);
+  };
+
+  // Open delete confirmation modal
+  const openDeleteModal = (complaint) => {
+    setSelectedComplaint(complaint);
+    setShowDeleteModal(true);
+  };
+
+  // Open assign modal
+  const openAssignModal = (complaint) => {
+    setSelectedComplaint(complaint);
+    setAssignForm({
+      officer: "",
+      deadline: "",
+      instructions: "",
+      arrivalTime: new Date().toLocaleTimeString()
+    });
+    setShowAssignModal(true);
+  };
+
+  // Handle assign form submission
+  const handleAssign = () => {
+    if (assignForm.officer && assignForm.deadline) {
+      const updatedComplaints = complaints.map(c =>
+        c.id === selectedComplaint.id
+          ? {
+            ...c,
+            status: "Assigned",
+            assignedTo: assignForm.officer,
+            assignedDate: new Date().toLocaleDateString(),
+            deadline: assignForm.deadline,
+            instructions: assignForm.instructions,
+            arrivalTime: assignForm.arrivalTime
+          }
+          : c
+      );
+
+      setComplaints(updatedComplaints);
+      setShowAssignModal(false);
+
+      // Add notification
+      setNotifications(prev => [
+        {
+          id: Date.now(),
+          message: `Complaint #${selectedComplaint.id} assigned to ${assignForm.officer}`,
+          type: "assignment",
+          time: new Date().toLocaleTimeString(),
+          read: false
+        },
+        ...prev
+      ]);
+
+      // Show notification modal
+      setShowNotificationModal(true);
+      setTimeout(() => setShowNotificationModal(false), 3000);
+    }
+  };
+
+  // Open details modal
+  const openDetailsModal = (complaint) => {
+    setSelectedComplaint(complaint);
+    setShowDetailsModal(true);
+  };
+
+  // Get priority color
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case "Critical": return "bg-red-500";
+      case "High": return "bg-orange-500";
+      case "Medium": return "bg-yellow-500";
+      case "Low": return "bg-green-500";
+      default: return "bg-gray-500";
+    }
   };
 
   // Mark all notifications as read
   const markAllAsRead = () => {
-    setNotifications(prev => prev.map(notification => ({ ...notification, read: true })));
-    setNewComplaintCount(0);
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   };
 
-  // Assign Investigator View
-  if (viewMode === "assignInvestigator" && selectedComplaint) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white p-4 md:p-6">
-        <div className="max-w-2xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-red-500 flex items-center gap-3">
-              <Send className="w-7 h-7" />
-              <span>Assign Investigator</span>
-            </h2>
+  // Simulate new incoming complaint notification
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newComplaint = {
+        id: complaints.length + 1,
+        name: `User ${complaints.length + 1}`,
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+        description: `New complaint received from user ${complaints.length + 1}. This is an automatically generated complaint for testing purposes.`,
+        status: "Incoming",
+        city: "New York",
+        location: "Downtown",
+        anonymous: Math.random() > 0.5,
+        images: [],
+        videos: [],
+        priority: ["Low", "Medium", "High", "Critical"][Math.floor(Math.random() * 4)],
+        type: ["Theft", "Assault", "Vandalism", "Noise", "Harassment"][Math.floor(Math.random() * 5)]
+      };
+
+      setComplaints((prev) => [newComplaint, ...prev]);
+
+      // Add notification
+      setNotifications(prev => [
+        {
+          id: Date.now(),
+          message: `New complaint #${newComplaint.id} registered`,
+          type: "new_complaint",
+          time: new Date().toLocaleTimeString(),
+          read: false
+        },
+        ...prev
+      ]);
+    }, 30000); // every 30 seconds a new complaint
+
+    return () => clearInterval(interval);
+  }, [complaints]);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white p-6">
+      {/* Header with Notifications */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold flex items-center gap-2">
+          <ClipboardList className="w-6 h-6 text-red-400" /> Manage Complaints
+        </h1>
+
+        <div className="flex items-center gap-4">
+          <div className="relative">
             <button
-              onClick={() => setViewMode("details")}
-              className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition"
+              onClick={() => setShowNotificationsPanel(!showNotificationsPanel)}
+              className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition relative"
             >
-              <X className="w-5 h-5" />
-              <span>Cancel</span>
+              <Bell className="w-5 h-5" />
+              <span>Alerts</span>
+              {notifications.filter(n => !n.read).length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-xs px-2 py-0.5 rounded-full">
+                  {notifications.filter(n => !n.read).length}
+                </span>
+              )}
             </button>
-          </div>
 
-          <div className="bg-gray-800/80 rounded-xl border border-gray-700 p-6">
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-red-400" />
-                Complaint Information
-              </h3>
-              <div className="bg-gray-700/50 p-4 rounded-lg">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-400">ID</p>
-                    <p className="font-medium">#{selectedComplaint.id}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-400">Type</p>
-                    <p className="font-medium">{selectedComplaint.type}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-400">Location</p>
-                    <p className="font-medium">{selectedComplaint.location}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-400">Priority</p>
-                    <p className={`text-xs px-2 py-1 rounded-full inline-block ${getPriorityColor(selectedComplaint.priority)}`}>
-                      {selectedComplaint.priority}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <ClockIcon className="w-5 h-5 text-blue-400" />
-                Schedule Investigation
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Investigation Time
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={investigationTime}
-                    onChange={(e) => setInvestigationTime(e.target.value)}
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Investigator Notes
-                  </label>
-                  <textarea
-                    placeholder="Add any specific instructions for the investigator..."
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-red-500 h-32"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={sendInvestigationNotification}
-              disabled={!investigationTime}
-              className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed px-4 py-3 rounded-lg font-medium transition flex items-center justify-center gap-2"
-            >
-              <Send className="w-5 h-5" />
-              Send Notification to Investigator
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // All Complaints View
-  if (viewMode === "allComplaints") {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white p-4 md:p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-red-500 flex items-center gap-3">
-              <FileText className="w-7 h-7" />
-              <span>All Complaints ({allComplaints.length})</span>
-            </h2>
-            <button
-              onClick={() => setViewMode("overview")}
-              className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition"
-            >
-              <ChevronLeft className="w-5 h-5" />
-              <span>Back to Dashboard</span>
-            </button>
-          </div>
-
-          {/* Search Bar */}
-          <div className="bg-gray-800/80 rounded-xl border border-gray-700 p-4 mb-6">
-            <div className="flex items-center gap-3">
-              <Search className="w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search complaints by type, location, or description..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
-            <p className="text-xs text-gray-400 mt-2">
-              Showing {filteredComplaints.length} of {allComplaints.length} complaints
-            </p>
-          </div>
-
-          {/* Complaints Table */}
-          <div className="bg-gray-800/80 rounded-xl border border-gray-700 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-700/50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">ID</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Type</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Location</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Date & Time</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Priority</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-700">
-                  {currentComplaints.map((complaint) => (
-                    <tr key={complaint.id} className="hover:bg-gray-700/50 transition">
-                      <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-300">#{complaint.id}</td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">{complaint.type}</td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{complaint.location}</td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">
-                        <div>{complaint.date}</div>
-                        <div className="text-xs text-gray-400">{complaint.time}</div>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(complaint.status)}`}>
-                          {complaint.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className={`text-xs px-2 py-1 rounded-full ${getPriorityColor(complaint.priority)}`}>
-                          {complaint.priority}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm">
-                        <button
-                          onClick={() => viewComplaintDetails(complaint)}
-                          className="text-blue-400 hover:text-blue-300 transition"
-                        >
-                          <Eye className="w-5 h-5" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between px-4 py-3 bg-gray-700/50">
-                <div className="text-sm text-gray-400">
-                  Showing {indexOfFirstComplaint + 1} to {Math.min(indexOfLastComplaint, filteredComplaints.length)} of {filteredComplaints.length} results
-                </div>
-                <div className="flex gap-1">
+            {/* Notifications Panel */}
+            {showNotificationsPanel && (
+              <div className="absolute right-0 mt-2 w-80 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50">
+                <div className="p-3 border-b border-gray-700 flex justify-between items-center">
+                  <h3 className="font-semibold">Notifications</h3>
                   <button
-                    onClick={() => paginate(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1}
-                    className="px-3 py-1 rounded-md bg-gray-600 text-gray-300 disabled:opacity-50"
+                    onClick={() => {
+                      markAllAsRead();
+                      setShowNotificationsPanel(false); // panel close ho jaye
+                    }}
+                    className="text-xs text-blue-400 hover:text-blue-300"
                   >
-                    <ChevronLeft className="w-4 h-4" />
+                    Mark all as read
                   </button>
-
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => paginate(pageNum)}
-                        className={`px-3 py-1 rounded-md ${currentPage === pageNum ? 'bg-red-600 text-white' : 'bg-gray-600 text-gray-300'}`}
+                </div>
+                <div className="max-h-96 overflow-y-auto">
+                  {notifications.length > 0 ? (
+                    notifications.map(notification => (
+                      <div
+                        key={notification.id}
+                        className={`p-3 border-b border-gray-700 hover:bg-gray-700/50 cursor-pointer ${notification.read ? 'opacity-70' : ''}`}
+                        onClick={() => {
+                          setNotifications(prev =>
+                            prev.map(n =>
+                              n.id === notification.id ? { ...n, read: true } : n
+                            )
+                          );
+                        }}
                       >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-
-                  <button
-                    onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-1 rounded-md bg-gray-600 text-gray-300 disabled:opacity-50"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+                        <div className="flex items-start gap-2">
+                          <div className={`mt-1 p-1 rounded-full ${notification.read ? 'bg-gray-600' : 'bg-blue-600'}`}>
+                            <Megaphone className="w-3 h-3" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm">{notification.message}</p>
+                            <p className="text-xs text-gray-400 mt-1">{notification.time}</p>
+                          </div>
+                          {!notification.read && (
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-4 text-center text-gray-400">
+                      No notifications
+                    </div>
+                  )}
                 </div>
               </div>
             )}
           </div>
         </div>
+
       </div>
-    );
-  }
 
-  // Complaint Detail View
-  if (viewMode === "details" && selectedComplaint) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white p-4 md:p-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-red-500 flex items-center gap-3">
-              <FileText className="w-7 h-7" />
-              <span>Complaint Details</span>
-            </h2>
-            <button
-              onClick={closeComplaintDetails}
-              className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition"
-            >
-              <X className="w-5 h-5" />
-              <span>Back to Dashboard</span>
-            </button>
+      {/* Search and Filter Section */}
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <input
+            type="text"
+            placeholder="Search complaints..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-gray-700 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+          />
+        </div>
+
+        <div className="flex gap-2">
+          <select
+            value={priorityFilter}
+            onChange={(e) => setPriorityFilter(e.target.value)}
+            className="bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+          >
+            <option value="All">All Priorities</option>
+            <option value="Critical">Critical</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex flex-wrap gap-3 mb-6">
+        {["Incoming", "Assigned", "Pending", "Resolved"].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => {
+              setActiveTab(tab);
+              setCurrentPage(1);
+            }}
+            className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 ${activeTab === tab
+              ? "bg-red-600 text-white"
+              : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+              }`}
+          >
+            {tab === "Incoming" && <Clock className="w-4 h-4" />}
+            {tab === "Assigned" && <UserCheck className="w-4 h-4" />}
+            {tab === "Pending" && <AlertTriangle className="w-4 h-4" />}
+            {tab === "Resolved" && <CheckCircle2 className="w-4 h-4" />}
+            {tab}
+            {tab === "Incoming" && notifications.filter(n => !n.read && n.type === "new_complaint").length > 0 &&
+              `(${notifications.filter(n => !n.read && n.type === "new_complaint").length})`
+            }
+          </button>
+        ))}
+      </div>
+
+      {/* Stats Overview */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-yellow-800/80 p-4 rounded-xl border border-gray-700">
+          <div className="text-sm text-gray-400">Total Complaints</div>
+          <div className="text-2xl font-bold">{complaints.length}</div>
+        </div>
+        <div className="bg-blue-800/80 p-4 rounded-xl border border-gray-700">
+          <div className="text-sm text-gray-400">Incoming</div>
+          <div className="text-2xl font-bold text-yellow-400">
+            {complaints.filter(c => c.status === "Incoming").length}
           </div>
+        </div>
+        <div className="bg-orange-800/80 p-4 rounded-xl border border-gray-700">
+          <div className="text-sm text-gray-400">Assigned</div>
+          <div className="text-2xl font-bold text-blue-400">
+            {complaints.filter(c => c.status === "Assigned").length}
+          </div>
+        </div>
+        <div className="bg-green-800/80 p-4 rounded-xl border border-gray-700">
+          <div className="text-sm text-gray-400">Resolved</div>
+          <div className="text-2xl font-bold text-green-400">
+            {complaints.filter(c => c.status === "Resolved").length}
+          </div>
+        </div>
+      </div>
 
-          <div className="bg-gray-800/80 rounded-xl border border-gray-700 p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5 text-red-400" />
-                  Complaint Information
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">ID:</span>
-                    <span className="font-medium">#{selectedComplaint.id}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Type:</span>
-                    <span className="font-medium">{selectedComplaint.type}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Status:</span>
-                    <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(selectedComplaint.status)}`}>
-                      {selectedComplaint.status}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Priority:</span>
-                    <span className={`text-xs px-2 py-1 rounded-full ${getPriorityColor(selectedComplaint.priority)}`}>
-                      {selectedComplaint.priority}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Anonymous:</span>
-                    <span className="font-medium">{selectedComplaint.anonymous ? "Yes" : "No"}</span>
+      {/* Complaints Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        {currentComplaints.length === 0 ? (
+          <div className="col-span-3 text-center py-10 text-gray-400">
+            <ClipboardList className="w-12 h-12 mx-auto mb-2 opacity-50" />
+            <p>No complaints found in {activeTab} status.</p>
+          </div>
+        ) : (
+          currentComplaints.map((c) => (
+            <div
+              key={c.id}
+              className="bg-gray-800/80 p-4 rounded-xl border border-gray-700 shadow hover:shadow-lg transition-all duration-300 hover:border-gray-500"
+            >
+              {/* Header Row */}
+              <div className="flex items-center justify-between mb-2">
+                {/* Left side */}
+                <div className="flex items-center gap-2 flex-1">
+                  <User className="w-4 h-4 text-gray-400" />
+                  <span className="font-semibold truncate">
+                    {c.anonymous ? "Anonymous" : c.name}
+                  </span>
+                </div>
+
+                {/* Right side */}
+                <div className="flex items-center gap-2 flex-1 justify-end">
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full ${getPriorityColor(
+                      c.priority
+                    )}`}
+                  >
+                    {c.priority}
+                  </span>
+                  <div className="text-sm text-gray-400 flex items-center">
+                    <Calendar className="w-4 h-4 mr-1" />
+                    {c.date}
                   </div>
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <Map className="w-5 h-5 text-blue-400" />
-                  Location & Time
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-gray-400" />
-                    <span>{selectedComplaint.location}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CalendarIcon className="w-4 h-4 text-gray-400" />
-                    <span>{selectedComplaint.date}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <ClockIcon className="w-4 h-4 text-gray-400" />
-                    <span>{selectedComplaint.time}</span>
-                  </div>
-                </div>
+              {/* Complaint Type */}
+              <div className="text-sm font-medium text-red-400 mb-1">
+                {c.type}
               </div>
-            </div>
 
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <MessageSquare className="w-5 h-5 text-green-400" />
-                Description
-              </h3>
-              <div className="bg-gray-700/50 p-4 rounded-lg">
-                <p className="text-gray-300">{selectedComplaint.description}</p>
+              {/* Location */}
+              <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                <MapPin className="w-4 h-4" />
+                {c.city}, {c.location}
               </div>
-            </div>
 
-            {selectedComplaint.media && selectedComplaint.media.length > 0 && (
-              <div>
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  {selectedComplaint.media[0].includes('.mp4') ? (
-                    <Video className="w-5 h-5 text-purple-400" />
-                  ) : (
-                    <Image className="w-5 h-5 text-purple-400" />
-                  )}
-                  Attached Media
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {selectedComplaint.media.map((media, index) => (
-                    <div key={index} className="bg-gray-700/50 p-4 rounded-lg flex items-center gap-3">
-                      {media.includes('.mp4') ? (
-                        <Video className="w-8 h-8 text-purple-400" />
-                      ) : media.includes('.jpg') || media.includes('.png') ? (
-                        <Image className="w-8 h-8 text-purple-400" />
-                      ) : (
-                        <FileText className="w-8 h-8 text-purple-400" />
-                      )}
-                      <div>
-                        <p className="font-medium">{media}</p>
-                        <p className="text-xs text-gray-400">
-                          {media.includes('.mp4') ? 'Video file' :
-                            media.includes('.jpg') || media.includes('.png') ? 'Image file' : 'Document'}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              {/* Complaint Text */}
+              <p className="text-gray-300 text-sm mb-3 line-clamp-2">{c.description}</p>
+
+              {/* Media Indicators */}
+              <div className="flex gap-2 mb-3">
+                {c.images.length > 0 && (
+                  <div className="flex items-center gap-1 text-xs text-blue-400">
+                    <Image className="w-4 h-4" />
+                    {c.images.length} Image{c.images.length !== 1 ? 's' : ''}
+                  </div>
+                )}
+                {c.videos.length > 0 && (
+                  <div className="flex items-center gap-1 text-xs text-purple-400">
+                    <Video className="w-4 h-4" />
+                    {c.videos.length} Video{c.videos.length !== 1 ? 's' : ''}
+                  </div>
+                )}
               </div>
-            )}
 
-            <div className="mt-8 flex gap-4">
-              <button
-                onClick={assignInvestigator}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 px-4 py-3 rounded-lg font-medium transition"
-              >
-                Assign Investigator
-              </button>
-              {selectedComplaint.status !== "Resolved" && (
+              {/* Actions */}
+              <div className="flex justify-between items-center">
+                {/* Left - Eye button */}
                 <button
-                  onClick={markAsResolved}
-                  className="flex-1 bg-green-600 hover:bg-green-700 px-4 py-3 rounded-lg font-medium transition"
+                  onClick={() => openDetailsModal(c)}
+                  className="text-blue-400 hover:text-blue-300 p-1 rounded-full hover:bg-blue-900/20 flex items-center justify-center w-8 h-8"
+                  title="View Details"
                 >
-                  Mark as Resolved
+                  <Eye className="w-5 h-5" />
                 </button>
+
+                {/* Center - Status buttons */}
+                <div className="flex-1 flex justify-center gap-2">
+                  {activeTab === "Incoming" && (
+                    <button
+                      onClick={() => openAssignModal(c)}
+                      className="bg-blue-600 hover:bg-blue-700 text-xs px-3 py-1 rounded flex items-center justify-center h-8"
+                    >
+                      Assign
+                    </button>
+                  )}
+                  {activeTab === "Assigned" && (
+                    <>
+                      <button
+                        onClick={() => updateStatus(c.id, "Pending")}
+                        className="bg-yellow-600 hover:bg-yellow-700 text-xs px-3 py-1 rounded h-8"
+                      >
+                        Pending
+                      </button>
+                      <button
+                        onClick={() => updateStatus(c.id, "Resolved")}
+                        className="bg-green-600 hover:bg-green-700 text-xs px-3 py-1 rounded h-8"
+                      >
+                        Resolve
+                      </button>
+                    </>
+                  )}
+                  {activeTab === "Pending" && (
+                    <button
+                      onClick={() => updateStatus(c.id, "Resolved")}
+                      className="bg-green-600 hover:bg-green-700 text-xs px-3 py-1 rounded h-8"
+                    >
+                      Resolve
+                    </button>
+                  )}
+                </div>
+
+                {/* Right - Delete button */}
+                <button
+                  onClick={() => openDeleteModal(c)}
+                  className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-900/20 flex items-center justify-center w-8 h-8"
+                  title="Delete Complaint"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
+
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 mt-6">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => p - 1)}
+            className="px-3 py-1 bg-gray-700 rounded disabled:opacity-50 flex items-center gap-1"
+          >
+            <span>←</span> Prev
+          </button>
+          <span className="px-3 py-1 bg-gray-800 rounded">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => p + 1)}
+            className="px-3 py-1 bg-gray-700 rounded disabled:opacity-50 flex items-center gap-1"
+          >
+            Next <span>→</span>
+          </button>
+        </div>
+      )}
+
+      {/* Assign Investigation Modal */}
+      {showAssignModal && selectedComplaint && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-xl w-full max-w-md border border-gray-700">
+            <div className="flex items-center justify-between p-4 border-b border-gray-700">
+              <h3 className="font-semibold flex items-center gap-2">
+                <UserCheck className="w-5 h-5 text-blue-400" />
+                Assign for Investigation
+              </h3>
+              <button onClick={() => setShowAssignModal(false)} className="text-gray-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-4">
+              <div className="mb-4">
+                <label className="block text-sm text-gray-400 mb-1">Select Officer</label>
+                <select
+                  value={assignForm.officer}
+                  onChange={(e) => setAssignForm({ ...assignForm, officer: e.target.value })}
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white"
+                >
+                  <option value="">Select an officer</option>
+                  {officers.map(officer => (
+                    <option key={officer} value={officer}>{officer}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm text-gray-400 mb-1">Deadline</label>
+                <input
+                  type="date"
+                  value={assignForm.deadline}
+                  onChange={(e) => setAssignForm({ ...assignForm, deadline: e.target.value })}
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm text-gray-400 mb-1">Arrival Time</label>
+                <input
+                  type="time"
+                  value={assignForm.arrivalTime}
+                  onChange={(e) => setAssignForm({ ...assignForm, arrivalTime: e.target.value })}
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm text-gray-400 mb-1">Investigation Time Estimate</label>
+                <select
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white"
+                >
+                  <option value="">Select time estimate</option>
+                  <option value="1h">1 hour</option>
+                  <option value="2h">2 hours</option>
+                  <option value="4h">4 hours</option>
+                  <option value="1d">1 day</option>
+                  <option value="2d">2 days</option>
+                  <option value="3d">3 days</option>
+                </select>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm text-gray-400 mb-1">Additional Instructions</label>
+                <textarea
+                  value={assignForm.instructions}
+                  onChange={(e) => setAssignForm({ ...assignForm, instructions: e.target.value })}
+                  rows="3"
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white"
+                  placeholder="Add any specific instructions for this investigation..."
+                ></textarea>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 p-4 border-t border-gray-700">
+              <button
+                onClick={() => setShowAssignModal(false)}
+                className="px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAssign}
+                disabled={!assignForm.officer || !assignForm.deadline}
+                className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+              >
+                <Send className="w-4 h-4" />
+                Assign Investigation
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Complaint Details Modal */}
+      {showDetailsModal && selectedComplaint && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-xl w-full max-w-2xl border border-gray-700 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 border-b border-gray-700 sticky top-0 bg-gray-800">
+              <h3 className="font-semibold flex items-center gap-2">
+                <FileText className="w-5 h-5 text-blue-400" />
+                Complaint Details
+              </h3>
+              <button onClick={() => setShowDetailsModal(false)} className="text-gray-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <h4 className="text-sm text-gray-400 mb-1">Complainant</h4>
+                  <p className="flex items-center gap-2">
+                    <User className="w-4 h-4" />
+                    {selectedComplaint.anonymous ? "Anonymous" : selectedComplaint.name}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="text-sm text-gray-400 mb-1">Date & Time</h4>
+                  <p className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    {selectedComplaint.date} at {selectedComplaint.time}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="text-sm text-gray-400 mb-1">City</h4>
+                  <p className="flex items-center gap-2">
+                    <Map className="w-4 h-4" />
+                    {selectedComplaint.city}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="text-sm text-gray-400 mb-1">Location Type</h4>
+                  <p className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    {selectedComplaint.location}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="text-sm text-gray-400 mb-1">Complaint Type</h4>
+                  <p className="text-red-400 font-medium">{selectedComplaint.type}</p>
+                </div>
+
+                <div>
+                  <h4 className="text-sm text-gray-400 mb-1">Priority</h4>
+                  <span className={`text-xs px-2 py-1 rounded-full ${getPriorityColor(selectedComplaint.priority)}`}>
+                    {selectedComplaint.priority}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <h4 className="text-sm text-gray-400 mb-1">Description</h4>
+                <p className="bg-gray-700 p-3 rounded-lg">{selectedComplaint.description}</p>
+              </div>
+
+              {/* Media Section */}
+              {(selectedComplaint.images.length > 0 || selectedComplaint.videos.length > 0) && (
+                <div className="mb-4">
+                  <h4 className="text-sm text-gray-400 mb-2">Attached Media</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    {selectedComplaint.images.map((img, index) => (
+                      <div key={index} className="bg-gray-700 rounded-lg overflow-hidden">
+                        <img src={img} alt={`Evidence ${index + 1}`} className="w-full h-32 object-cover" />
+                        <div className="p-2 text-xs text-center">Image {index + 1}</div>
+                      </div>
+                    ))}
+                    {selectedComplaint.videos.map((vid, index) => (
+                      <div key={index} className="bg-gray-700 rounded-lg overflow-hidden">
+                        <div className="w-full h-32 bg-gray-600 flex items-center justify-center">
+                          <Video className="w-8 h-8 text-white" />
+                        </div>
+                        <div className="p-2 text-xs text-center">Video {index + 1}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Assignment Details if Assigned */}
+              {selectedComplaint.status === "Assigned" && selectedComplaint.assignedTo && (
+                <div className="bg-blue-900/20 p-3 rounded-lg border border-blue-700/50">
+                  <h4 className="text-sm text-blue-400 mb-2 flex items-center gap-2">
+                    <UserCheck className="w-4 h-4" />
+                    Investigation Assignment
+                  </h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-gray-400">Assigned To:</span>
+                      <p>{selectedComplaint.assignedTo}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">Assigned On:</span>
+                      <p>{selectedComplaint.assignedDate}</p>
+                    </div>
+                    {selectedComplaint.deadline && (
+                      <div>
+                        <span className="text-gray-400">Deadline:</span>
+                        <p>{selectedComplaint.deadline}</p>
+                      </div>
+                    )}
+                    {selectedComplaint.arrivalTime && (
+                      <div>
+                        <span className="text-gray-400">Arrival Time:</span>
+                        <p>{selectedComplaint.arrivalTime}</p>
+                      </div>
+                    )}
+                    {selectedComplaint.investigationTime && (
+                      <div>
+                        <span className="text-gray-400">Time Estimate:</span>
+                        <p>{selectedComplaint.investigationTime}</p>
+                      </div>
+                    )}
+                    {selectedComplaint.instructions && (
+                      <div className="col-span-2">
+                        <span className="text-gray-400">Instructions:</span>
+                        <p className="mt-1 bg-blue-900/30 p-2 rounded">{selectedComplaint.instructions}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
-          </div>
-        </div>
 
-        {/* Resolved Popup */}
-        <AnimatePresence>
-          {resolvedPopup && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50"
-            >
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                className="bg-gray-800 p-6 rounded-xl border border-green-500/50 max-w-md w-full mx-4 text-center"
-              >
-                <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                <h3 className="text-2xl font-bold text-green-400 mb-2">Case Resolved!</h3>
-                <p className="text-gray-300">
-                  Complaint #{selectedComplaint.id} has been marked as resolved successfully.
-                </p>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Assign Investigator Popup */}
-        <AnimatePresence>
-          {assignPopup && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50"
-            >
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                className="bg-gray-800 p-6 rounded-xl border border-blue-500/50 max-w-md w-full mx-4 text-center"
-              >
-                <Send className="w-16 h-16 text-blue-500 mx-auto mb-4" />
-                <h3 className="text-2xl font-bold text-blue-400 mb-2">Notification Sent!</h3>
-                <p className="text-gray-300">
-                  Investigator has been notified to investigate complaint #{selectedComplaint.id} at {investigationTime}.
-                </p>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    );
-  }
-
-  // Main Dashboard View
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white p-4 md:p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 md:mb-8">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-red-500 flex items-center gap-3">
-              <BarChart3 className="w-7 h-7 md:w-8 md:h-8" />
-              <span>Complaints Management System</span>
-            </h2>
-            <p className="text-gray-400 mt-1 text-sm md:text-base">
-              Monitor and analyze citizen complaints and reports
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* Notification Bell */}
-            <div className="relative">
+            <div className="flex justify-end p-4 border-t border-gray-700 sticky bottom-0 bg-gray-800">
               <button
-                onClick={() => setShowNotifications(!showNotifications)}
-                className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 px-3 md:px-4 py-2 rounded-lg text-sm transition relative"
+                onClick={() => setShowDetailsModal(false)}
+                className="px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600"
               >
-                <Bell className="w-4 h-4 md:w-5 md:h-5" />
-                <span>Notifications</span>
-                {newComplaintCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {newComplaintCount}
-                  </span>
-                )}
-              </button>
-
-              {/* Notification Dropdown */}
-              <AnimatePresence>
-                {showNotifications && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute right-0 mt-2 w-80 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50"
-                  >
-                    <div className="p-3 border-b border-gray-700 flex justify-between items-center">
-                      <h3 className="font-semibold">Notifications</h3>
-                      <button
-                        onClick={markAllAsRead}
-                        className="text-xs text-blue-400 hover:text-blue-300"
-                      >
-                        Mark all as read
-                      </button>
-                    </div>
-                    <div className="max-h-96 overflow-y-auto">
-                      {notifications.length > 0 ? (
-                        notifications.map(notification => (
-                          <div
-                            key={notification.id}
-                            className={`p-3 border-b border-gray-700 hover:bg-gray-700/50 cursor-pointer ${notification.read ? 'opacity-70' : ''}`}
-                            onClick={() => {
-                              markAsRead(notification.id);
-                              if (notification.type === "new_complaint") {
-                                viewComplaintDetails(notification.complaint);
-                                setShowNotifications(false);
-                              }
-                            }}
-                          >
-                            <div className="flex items-start gap-2">
-                              <div className={`mt-1 p-1 rounded-full ${notification.read ? 'bg-gray-600' : 'bg-blue-600'}`}>
-                                <Megaphone className="w-3 h-3" />
-                              </div>
-                              <div className="flex-1">
-                                <p className="text-sm">{notification.message}</p>
-                                <p className="text-xs text-gray-400 mt-1">{notification.time}</p>
-                              </div>
-                              {!notification.read && (
-                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                              )}
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="p-4 text-center text-gray-400">
-                          No notifications
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <button className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 px-3 md:px-4 py-2 rounded-lg text-sm transition">
-              <Download className="w-4 h-4 md:w-5 md:h-5" />
-              <span>Export</span>
-            </button>
-            <button className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 px-3 md:px-4 py-2 rounded-lg text-sm transition">
-              <Filter className="w-4 h-4 md:w-5 md:h-5" />
-              <span>Filters</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Notification Toast */}
-        <AnimatePresence>
-          {newComplaintCount > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: -50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -50 }}
-              className="fixed top-4 right-4 bg-blue-600 text-white p-4 rounded-lg shadow-lg z-50 max-w-sm"
-            >
-              <div className="flex items-center gap-3">
-                <Megaphone className="w-5 h-5" />
-                <div>
-                  <p className="font-medium">New Complaint Registered</p>
-                  <p className="text-sm opacity-80">Check notifications for details</p>
-                </div>
-                <button
-                  onClick={() => setNewComplaintCount(0)}
-                  className="ml-4 text-white opacity-70 hover:opacity-100"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-          <div className="bg-gradient-to-br from-red-900/30 to-red-800/10 p-5 md:p-6 rounded-xl border border-red-800/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-medium text-gray-400 mb-2">Total Complaints</h3>
-                <p className="text-2xl md:text-3xl font-bold text-white">{allComplaints.length}</p>
-              </div>
-              <div className="bg-red-900/50 p-3 rounded-full">
-                <FileText className="w-6 h-6 text-red-400" />
-              </div>
-            </div>
-            <p className="text-xs text-gray-400 mt-3">
-              <span className="text-red-400">+12%</span> from last month
-            </p>
-          </div>
-
-          <div className="bg-gradient-to-br from-green-900/30 to-green-800/10 p-5 md:p-6 rounded-xl border border-green-800/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-medium text-gray-400 mb-2">Resolved</h3>
-                <p className="text-2xl md:text-3xl font-bold text-white">{allComplaints.filter(c => c.status === "Resolved").length}</p>
-              </div>
-              <div className="bg-green-900/50 p-3 rounded-full">
-                <ShieldAlert className="w-6 h-6 text-green-400" />
-              </div>
-            </div>
-            <p className="text-xs text-gray-400 mt-3">
-              <span className="text-green-400">{Math.round((allComplaints.filter(c => c.status === "Resolved").length / allComplaints.length) * 100)}%</span> resolution rate
-            </p>
-          </div>
-
-          <div className="bg-gradient-to-br from-blue-900/30 to-blue-800/10 p-5 md:p-6 rounded-xl border border-blue-800/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-medium text-gray-400 mb-2">Avg. Response Time</h3>
-                <p className="text-2xl md:text-3xl font-bold text-white">2.4h</p>
-              </div>
-              <div className="bg-blue-900/50 p-3 rounded-full">
-                <Clock className="w-6 h-6 text-blue-400" />
-              </div>
-            </div>
-            <p className="text-xs text-gray-400 mt-3">
-              <span className="text-blue-400">-0.8h</span> from last month
-            </p>
-          </div>
-        </div>
-
-        {/* Recent Complaints List */}
-        <div className="bg-gray-800/80 rounded-xl border border-gray-700 overflow-hidden mb-6 md:mb-8">
-          <button
-            onClick={() => toggleSection("recent")}
-            className="w-full flex items-center justify-between p-4 md:p-6 hover:bg-gray-700/50 transition"
-          >
-            <h3 className="text-xl font-semibold flex items-center gap-2">
-              <FileText className="w-5 h-5 text-green-400" /> Recent Complaints
-            </h3>
-            {expandedSection === "recent" ? (
-              <ChevronUp className="w-5 h-5 text-gray-400" />
-            ) : (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
-            )}
-          </button>
-
-          {expandedSection === "recent" && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="p-4 md:p-6 pt-0"
-            >
-              <div className="space-y-3">
-                {allComplaints.slice(0, 5).map((complaint) => (
-                  <div
-                    key={complaint.id}
-                    className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg hover:bg-gray-600/50 transition cursor-pointer"
-                    onClick={() => viewComplaintDetails(complaint)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-full ${complaint.anonymous ? 'bg-purple-900/50 text-purple-400' : 'bg-blue-900/50 text-blue-400'}`}>
-                        {complaint.anonymous ? <User className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
-                      </div>
-                      <div>
-                        <p className="font-medium">{complaint.type}</p>
-                        <p className="text-xs text-gray-400">{complaint.location} • {complaint.time}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(complaint.status)}`}>
-                        {complaint.status}
-                      </span>
-                      <Eye className="w-4 h-4 text-gray-400" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="text-center mt-4">
-                <button
-                  onClick={viewAllComplaints}
-                  className="text-blue-400 hover:text-blue-300 text-sm flex items-center justify-center gap-1"
-                >
-                  View All {allComplaints.length} Complaints <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </div>
-
-        {/* Complaints Trends Section */}
-        <div className="bg-gray-800/80 rounded-xl border border-gray-700 p-4 md:p-6 mb-6 md:mb-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-            <h3 className="text-xl font-semibold flex items-center gap-2">
-              <LineChart className="w-5 h-5 text-blue-400" /> Complaints Trends
-            </h3>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setTimeRange("weekly")}
-                className={`px-3 py-1 rounded-lg text-sm ${timeRange === "weekly" ? "bg-blue-600 text-white" : "bg-gray-700 hover:bg-gray-600"}`}
-              >
-                Weekly
-              </button>
-              <button
-                onClick={() => setTimeRange("monthly")}
-                className={`px-3 py-1 rounded-lg text-sm ${timeRange === "monthly" ? "bg-blue-600 text-white" : "bg-gray-700 hover:bg-gray-600"}`}
-              >
-                Monthly
-              </button>
-              <button
-                onClick={() => setTimeRange("yearly")}
-                className={`px-3 py-1 rounded-lg text-sm ${timeRange === "yearly" ? "bg-blue-600 text-white" : "bg-gray-700 hover:bg-gray-600"}`}
-              >
-                Yearly
+                Close
               </button>
             </div>
           </div>
-          <div className="h-64 md:h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={complaintsData}>
-                <XAxis dataKey="name" stroke="#6b7280" />
-                <YAxis stroke="#6b7280" />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', borderRadius: '0.5rem' }}
-                  formatter={(value, name) => {
-                    if (name === "Complaints") {
-                      return [value, "Total Complaints"];
-                    }
-                    return [value, name];
-                  }}
-                />
-                <Legend />
-                <Bar
-                  dataKey="complaints"
-                  name="Complaints"
-                  fill="#e11d48"
-                  radius={[4, 4, 0, 0]}
-                  onClick={(data) => {
-                    if (data && data.details) {
-                      // Show first complaint details as example
-                      viewComplaintDetails(data.details[0]);
-                    }
-                  }}
-                  style={{ cursor: 'pointer' }}
-                />
-                <Bar dataKey="resolved" name="Resolved" fill="#10b981" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="anonymous" name="Anonymous" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="text-xs text-gray-500 mt-4">
-            * Click on complaint bars to view detailed information
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && selectedComplaint && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-xl w-full max-w-md border border-gray-700">
+            <div className="flex items-center justify-between p-4 border-b border-gray-700">
+              <h3 className="font-semibold flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-red-400" />
+                Confirm Deletion
+              </h3>
+              <button onClick={() => setShowDeleteModal(false)} className="text-gray-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-4">
+              <p className="text-gray-300 mb-4">
+                Are you sure you want to delete complaint #{selectedComplaint.id}? This action cannot be undone.
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-2 p-4 border-t border-gray-700">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => deleteComplaint(selectedComplaint.id)}
+                className="px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 flex items-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete Complaint
+              </button>
+            </div>
           </div>
         </div>
+      )}
 
-        <footer className="text-center mt-8 text-sm text-gray-500">
-          © {new Date().getFullYear()} Complaints Management System • v2.0.0
-        </footer>
-      </div>
+      {/* Notification Sent Modal */}
+      {showNotificationModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 p-6 rounded-xl border border-green-500/50 max-w-md w-full mx-4 text-center">
+            <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
+            <h3 className="text-2xl font-bold text-green-400 mb-2">Notification Sent!</h3>
+            <p className="text-gray-300">
+              Investigator has been notified about complaint #{selectedComplaint.id}.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Resolved Modal */}
+      {showResolvedModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 p-6 rounded-xl border border-green-500/50 max-w-md w-full mx-4 text-center">
+            <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
+            <h3 className="text-2xl font-bold text-green-400 mb-2">Complaint Resolved!</h3>
+            <p className="text-gray-300">
+              Complaint #{selectedComplaint?.id} has been marked as resolved.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

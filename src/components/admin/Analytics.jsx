@@ -1,25 +1,25 @@
 import React, { useState } from "react";
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  Tooltip, 
-  ResponsiveContainer, 
-  PieChart, 
-  Pie, 
-  Cell, 
-  Legend, 
-  AreaChart, 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  AreaChart,
   Area,
   LineChart,
   Line,
   CartesianGrid
 } from "recharts";
 import { motion } from "framer-motion";
-import { 
-  BarChart3, 
-  PieChart as PieIcon, 
+import {
+  BarChart3,
+  PieChart as PieIcon,
   LineChart as LineIcon,
   Filter,
   Download,
@@ -43,15 +43,59 @@ const monthlyCrimeData = [
   { name: "Apr", theft: 15, assault: 9, vandalism: 6, resolved: 20 },
   { name: "May", theft: 27, assault: 16, vandalism: 11, resolved: 35 },
   { name: "Jun", theft: 34, assault: 20, vandalism: 14, resolved: 42 },
+  { name: "Jul", theft: 29, assault: 18, vandalism: 12, resolved: 38 },
+  { name: "Aug", theft: 32, assault: 19, vandalism: 13, resolved: 41 },
+  { name: "Sep", theft: 25, assault: 15, vandalism: 10, resolved: 32 },
+  { name: "Oct", theft: 21, assault: 13, vandalism: 8, resolved: 28 },
+  { name: "Nov", theft: 18, assault: 11, vandalism: 7, resolved: 24 },
+  { name: "Dec", theft: 15, assault: 9, vandalism: 6, resolved: 20 },
 ];
 
-const crimeTypeData = [
-  { name: "Theft", value: 42, color: "#e11d48" },
-  { name: "Assault", value: 23, color: "#f97316" },
-  { name: "Vandalism", value: 18, color: "#3b82f6" },
-  { name: "Fraud", value: 12, color: "#10b981" },
-  { name: "Drugs", value: 8, color: "#8b5cf6" },
-];
+// District-wise crime data
+const districtCrimeData = {
+  all: [
+    { name: "Theft", value: 42, color: "#e11d48" },
+    { name: "Assault", value: 23, color: "#f97316" },
+    { name: "Vandalism", value: 18, color: "#3b82f6" },
+    { name: "Fraud", value: 12, color: "#10b981" },
+    { name: "Drugs", value: 8, color: "#8b5cf6" },
+  ],
+  north: [
+    { name: "Theft", value: 18, color: "#e11d48" },
+    { name: "Assault", value: 12, color: "#f97316" },
+    { name: "Vandalism", value: 8, color: "#3b82f6" },
+    { name: "Fraud", value: 6, color: "#10b981" },
+    { name: "Drugs", value: 4, color: "#8b5cf6" },
+  ],
+  south: [
+    { name: "Theft", value: 12, color: "#e11d48" },
+    { name: "Assault", value: 6, color: "#f97316" },
+    { name: "Vandalism", value: 5, color: "#3b82f6" },
+    { name: "Fraud", value: 3, color: "#10b981" },
+    { name: "Drugs", value: 2, color: "#8b5cf6" },
+  ],
+  east: [
+    { name: "Theft", value: 8, color: "#e11d48" },
+    { name: "Assault", value: 4, color: "#f97316" },
+    { name: "Vandalism", value: 3, color: "#3b82f6" },
+    { name: "Fraud", value: 2, color: "#10b981" },
+    { name: "Drugs", value: 1, color: "#8b5cf6" },
+  ],
+  west: [
+    { name: "Theft", value: 10, color: "#e11d48" },
+    { name: "Assault", value: 5, color: "#f97316" },
+    { name: "Vandalism", value: 4, color: "#3b82f6" },
+    { name: "Fraud", value: 3, color: "#10b981" },
+    { name: "Drugs", value: 2, color: "#8b5cf6" },
+  ],
+  punjab: [
+    { name: "Theft", value: 15, color: "#e11d48" },
+    { name: "Assault", value: 8, color: "#f97316" },
+    { name: "Vandalism", value: 6, color: "#3b82f6" },
+    { name: "Fraud", value: 4, color: "#10b981" },
+    { name: "Drugs", value: 3, color: "#8b5cf6" },
+  ]
+};
 
 const hourlyCrimeData = [
   { hour: "00:00", crimes: 4 },
@@ -83,7 +127,7 @@ const responseTimes = [
 
 export default function Analytics() {
   const [timeRange, setTimeRange] = useState("monthly");
-  const [crimeTypeFilter, setCrimeTypeFilter] = useState("all");
+  const [districtFilter, setDistrictFilter] = useState("all");
   const [expandedSection, setExpandedSection] = useState(null);
 
   const toggleSection = (section) => {
@@ -97,58 +141,42 @@ export default function Analytics() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-red-500 flex items-center gap-3">
-              <Activity className="w-7 h-7 md:w-8 md:h-8" /> 
+              <Activity className="w-7 h-7 md:w-8 md:h-8" />
               <span>Crime Analytics Dashboard</span>
             </h2>
             <p className="text-gray-400 mt-1 text-sm md:text-base">
               Real-time crime statistics and predictive analysis
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 px-3 md:px-4 py-2 rounded-lg text-sm transition">
-              <Download className="w-4 h-4 md:w-5 md:h-5" />
-              <span>Export Data</span>
-            </button>
-            <button className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 px-3 md:px-4 py-2 rounded-lg text-sm transition">
-              <Filter className="w-4 h-4 md:w-5 md:h-5" />
-              <span>Filters</span>
-            </button>
-          </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-gray-800/80 p-4 rounded-xl border border-gray-700">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+          <div className="bg-gray-800/80 p-6 rounded-2xl border border-gray-700 w-full">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm text-gray-400">Total Crimes</h3>
-              <span className="text-xs bg-red-900/50 text-red-400 px-2 py-1 rounded-full">+18%</span>
+              <h3 className="text-base text-gray-400">Clearance Rate</h3>
+              <span className="text-sm bg-green-900/50 text-green-400 px-3 py-1 rounded-full">+5%</span>
             </div>
-            <p className="text-2xl font-bold mt-1">1,248</p>
-            <p className="text-xs text-gray-500">Last 30 days</p>
+            <p className="text-3xl font-bold mt-2">68%</p>
+            <p className="text-sm text-gray-500">Above national average</p>
           </div>
-          <div className="bg-gray-800/80 p-4 rounded-xl border border-gray-700">
+
+          <div className="bg-gray-800/80 p-6 rounded-2xl border border-gray-700 w-full">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm text-gray-400">Clearance Rate</h3>
-              <span className="text-xs bg-green-900/50 text-green-400 px-2 py-1 rounded-full">+5%</span>
+              <h3 className="text-base text-gray-400">Avg Response Time</h3>
+              <span className="text-sm bg-yellow-900/50 text-yellow-400 px-3 py-1 rounded-full">-12%</span>
             </div>
-            <p className="text-2xl font-bold mt-1">68%</p>
-            <p className="text-xs text-gray-500">Above national average</p>
+            <p className="text-3xl font-bold mt-2">8.2 min</p>
+            <p className="text-sm text-gray-500">Emergency calls</p>
           </div>
-          <div className="bg-gray-800/80 p-4 rounded-xl border border-gray-700">
+
+          <div className="bg-gray-800/80 p-6 rounded-2xl border border-gray-700 w-full">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm text-gray-400">Avg Response Time</h3>
-              <span className="text-xs bg-yellow-900/50 text-yellow-400 px-2 py-1 rounded-full">-12%</span>
+              <h3 className="text-base text-gray-400">Hotspots</h3>
+              <span className="text-sm bg-orange-900/50 text-orange-400 px-3 py-1 rounded-full">3 new</span>
             </div>
-            <p className="text-2xl font-bold mt-1">8.2 min</p>
-            <p className="text-xs text-gray-500">Emergency calls</p>
-          </div>
-          <div className="bg-gray-800/80 p-4 rounded-xl border border-gray-700">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm text-gray-400">Hotspots</h3>
-              <span className="text-xs bg-orange-900/50 text-orange-400 px-2 py-1 rounded-full">3 new</span>
-            </div>
-            <p className="text-2xl font-bold mt-1">24</p>
-            <p className="text-xs text-gray-500">High-risk areas</p>
+            <p className="text-3xl font-bold mt-2">24</p>
+            <p className="text-sm text-gray-500">High-risk areas</p>
           </div>
         </div>
 
@@ -162,13 +190,13 @@ export default function Analytics() {
                 Monthly Crime Trends
               </h3>
               <div className="flex gap-2">
-                <button 
+                <button
                   onClick={() => setTimeRange("monthly")}
                   className={`px-2 py-1 text-xs rounded ${timeRange === "monthly" ? "bg-blue-600 text-white" : "bg-gray-700 hover:bg-gray-600"}`}
                 >
                   Monthly
                 </button>
-                <button 
+                <button
                   onClick={() => setTimeRange("weekly")}
                   className={`px-2 py-1 text-xs rounded ${timeRange === "weekly" ? "bg-blue-600 text-white" : "bg-gray-700 hover:bg-gray-600"}`}
                 >
@@ -178,14 +206,14 @@ export default function Analytics() {
             </div>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlyCrimeData}>
+                <BarChart data={monthlyCrimeData} margin={{ right: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                   <XAxis dataKey="name" stroke="#9ca3af" />
                   <YAxis stroke="#9ca3af" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1f2937', 
-                      borderColor: '#374151', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#1f2937',
+                      borderColor: '#374151',
                       borderRadius: '0.5rem',
                       boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }}
@@ -207,21 +235,24 @@ export default function Analytics() {
                 <PieIcon className="w-5 h-5 text-orange-400" />
                 Crime Type Distribution
               </h3>
-              <select 
-                value={crimeTypeFilter}
-                onChange={(e) => setCrimeTypeFilter(e.target.value)}
+              <select
+                value={districtFilter}
+                onChange={(e) => setDistrictFilter(e.target.value)}
                 className="bg-gray-700 border border-gray-600 text-white text-xs rounded px-2 py-1"
               >
-                <option value="all">All Areas</option>
+                <option value="all">All Districts</option>
                 <option value="north">North District</option>
                 <option value="south">South District</option>
+                <option value="east">East District</option>
+                <option value="west">West District</option>
+                <option value="punjab">Punjab District</option>
               </select>
             </div>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={crimeTypeData}
+                    data={districtCrimeData[districtFilter]}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
@@ -230,15 +261,15 @@ export default function Analytics() {
                     dataKey="value"
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   >
-                    {crimeTypeData.map((entry, index) => (
+                    {districtCrimeData[districtFilter].map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip 
+                  <Tooltip
                     formatter={(value, name) => [`${value} cases`, name]}
-                    contentStyle={{ 
-                      backgroundColor: '#1f2937', 
-                      borderColor: '#374151', 
+                    contentStyle={{
+                      backgroundColor: '#1f2937',
+                      borderColor: '#374151',
                       borderRadius: '0.5rem'
                     }}
                   />
@@ -262,26 +293,26 @@ export default function Analytics() {
                 <AreaChart data={hourlyCrimeData}>
                   <defs>
                     <linearGradient id="colorCrimes" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#e11d48" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#e11d48" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#e11d48" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#e11d48" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                   <XAxis dataKey="hour" stroke="#9ca3af" />
                   <YAxis stroke="#9ca3af" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1f2937', 
-                      borderColor: '#374151', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#1f2937',
+                      borderColor: '#374151',
                       borderRadius: '0.5rem'
                     }}
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="crimes" 
-                    stroke="#e11d48" 
-                    fillOpacity={1} 
-                    fill="url(#colorCrimes)" 
+                  <Area
+                    type="monotone"
+                    dataKey="crimes"
+                    stroke="#e11d48"
+                    fillOpacity={1}
+                    fill="url(#colorCrimes)"
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -300,19 +331,19 @@ export default function Analytics() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                   <XAxis dataKey="day" stroke="#9ca3af" />
                   <YAxis stroke="#9ca3af" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1f2937', 
-                      borderColor: '#374151', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#1f2937',
+                      borderColor: '#374151',
                       borderRadius: '0.5rem'
                     }}
                     formatter={(value) => [`${value} minutes`, "Avg Response Time"]}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="time" 
-                    stroke="#10b981" 
-                    strokeWidth={2} 
+                  <Line
+                    type="monotone"
+                    dataKey="time"
+                    stroke="#10b981"
+                    strokeWidth={2}
                     dot={{ r: 4 }}
                     activeDot={{ r: 6 }}
                   />
@@ -324,12 +355,12 @@ export default function Analytics() {
 
         {/* Expandable Hot Zones Section */}
         <div className="bg-gray-800/80 rounded-xl border border-gray-700 overflow-hidden mb-6">
-          <button 
+          <button
             onClick={() => toggleSection("hotzones")}
             className="w-full flex items-center justify-between p-4 md:p-6 hover:bg-gray-700/50 transition"
           >
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-yellow-400" /> 
+              <AlertTriangle className="w-5 h-5 text-yellow-400" />
               High Risk Zones
             </h3>
             {expandedSection === "hotzones" ? (
@@ -338,7 +369,7 @@ export default function Analytics() {
               <ChevronDown className="w-5 h-5 text-gray-400" />
             )}
           </button>
-          
+
           {expandedSection === "hotzones" && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
@@ -388,10 +419,10 @@ export default function Analytics() {
                         <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                         <XAxis type="number" stroke="#9ca3af" />
                         <YAxis dataKey="name" type="category" stroke="#9ca3af" />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: '#1f2937', 
-                            borderColor: '#374151', 
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: '#1f2937',
+                            borderColor: '#374151',
                             borderRadius: '0.5rem'
                           }}
                           formatter={(value) => [`${value} cases`, "Reported Incidents"]}

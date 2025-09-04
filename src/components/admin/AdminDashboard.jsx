@@ -1,36 +1,125 @@
-import React from "react";
-import { 
-  ShieldCheck, 
-  FileText, 
-  BarChart2, 
-  MapPin, 
-  Users, 
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  ShieldCheck,
+  FileText,
+  BarChart2,
+  MapPin,
+  Users,
   AlertCircle,
   Activity,
   Bell,
   Map,
   AlertTriangle,
   Clock,
-  CheckCircle2
+  CheckCircle2,
+  X,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function AdminDashboard() {
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [showEmergencyModal, setShowEmergencyModal] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+  const [emergencyMessage, setEmergencyMessage] = useState("");
+  const [alertError, setAlertError] = useState("");
+  const [emergencyError, setEmergencyError] = useState("");
+
   const stats = [
-    { icon: <FileText className="w-8 h-8" />, title: 'Total Complaints', count: 120, trend: '↑ 12%', trendColor: 'text-red-400', description: 'From last month' },
-    { icon: <BarChart2 className="w-8 h-8" />, title: 'Reports Analyzed', count: 45, trend: '↑ 8%', trendColor: 'text-green-400', description: 'AI processed reports' },
-    { icon: <MapPin className="w-8 h-8" />, title: 'Police Stations', count: 18, trend: '→ 0%', trendColor: 'text-gray-400', description: 'Active stations' },
-    { icon: <ShieldCheck className="w-8 h-8" />, title: 'Resolved Cases', count: 97, trend: '↑ 23%', trendColor: 'text-green-400', description: 'Efficiency improved' },
-    { icon: <AlertCircle className="w-8 h-8" />, title: 'Pending Issues', count: 23, trend: '↓ 5%', trendColor: 'text-yellow-400', description: 'Needs attention' },
-    { icon: <Users className="w-8 h-8" />, title: 'Registered Users', count: 300, trend: '↑ 15%', trendColor: 'text-blue-400', description: 'New signups' },
+    {
+      icon: <FileText className="w-8 h-8" />,
+      title: "Total Complaints",
+      count: 120,
+      trend: "↑ 12%",
+      trendColor: "text-red-400",
+      description: "Total Complaints",
+      link: "/admin/manage",
+    },
+    {
+      icon: <BarChart2 className="w-8 h-8" />,
+      title: "Reports Analyzed",
+      count: 45,
+      trend: "↑ 8%",
+      trendColor: "text-green-400",
+      description: "AI processed reports",
+      link: "/admin/manage",
+    },
+    {
+      icon: <MapPin className="w-8 h-8" />,
+      title: "Police Stations",
+      count: 18,
+      trend: "→ 0%",
+      trendColor: "text-gray-400",
+      description: "Active stations",
+      link: "/admin/stations",
+    },
+    {
+      icon: <ShieldCheck className="w-8 h-8" />,
+      title: "Resolved Cases",
+      count: 97,
+      trend: "↑ 23%",
+      trendColor: "text-green-400",
+      description: "Efficiency improved",
+      link: "/admin/manage",
+    },
+    {
+      icon: <AlertCircle className="w-8 h-8" />,
+      title: "Pending Issues",
+      count: 23,
+      trend: "↓ 5%",
+      trendColor: "text-yellow-400",
+      description: "Needs attention",
+      link: "/admin/manage",
+    },
+    {
+      icon: <Users className="w-8 h-8" />,
+      title: "Registered Users",
+      count: 300,
+      trend: "↑ 15%",
+      trendColor: "text-blue-400",
+      description: "New signups",
+      link: "/User",
+    },
   ];
 
   const activities = [
-    { id: 1, type: 'alert', icon: <AlertTriangle className="w-5 h-5 text-red-500" />, text: "Theft reported at Main Street at 09:30 AM", time: "2 mins ago" },
-    { id: 2, type: 'success', icon: <CheckCircle2 className="w-5 h-5 text-green-500" />, text: "Case #1045 marked as resolved", time: "15 mins ago" },
-    { id: 3, type: 'warning', icon: <AlertTriangle className="w-5 h-5 text-yellow-500" />, text: "Suspicious activity flagged in West District", time: "32 mins ago" },
-    { id: 4, type: 'info', icon: <Activity className="w-5 h-5 text-blue-500" />, text: "Patrol dispatched to Sector 12", time: "1 hour ago" },
-    { id: 5, type: 'error', icon: <AlertCircle className="w-5 h-5 text-red-400" />, text: "Complaint #2012 rejected due to insufficient evidence", time: "2 hours ago" },
+    {
+      id: 1,
+      type: "alert",
+      icon: <AlertTriangle className="w-5 h-5 text-red-500" />,
+      text: "Theft reported at Main Street at 09:30 AM",
+      time: "2 mins ago",
+    },
+    {
+      id: 2,
+      type: "success",
+      icon: <CheckCircle2 className="w-5 h-5 text-green-500" />,
+      text: "Case #1045 marked as resolved",
+      time: "15 mins ago",
+    },
+    {
+      id: 3,
+      type: "warning",
+      icon: <AlertTriangle className="w-5 h-5 text-yellow-500" />,
+      text: "Suspicious activity flagged in West District",
+      time: "32 mins ago",
+    },
+    {
+      id: 4,
+      type: "info",
+      icon: <Activity className="w-5 h-5 text-blue-500" />,
+      text: "Patrol dispatched to Sector 12",
+      time: "1 hour ago",
+    },
+    {
+      id: 5,
+      type: "error",
+      icon: <AlertCircle className="w-5 h-5 text-red-400" />,
+      text: "Complaint #2012 rejected due to insufficient evidence",
+      time: "2 hours ago",
+    },
   ];
 
   const crimeHotspots = [
@@ -38,6 +127,52 @@ export default function AdminDashboard() {
     { name: "Industrial Zone", risk: "Medium", cases: 15 },
     { name: "University District", risk: "Low", cases: 8 },
   ];
+
+  const handleSendAlert = () => {
+    if (!alertMessage.trim()) {
+      setAlertError("Please write something before sending an alert");
+      return;
+    }
+    
+    // Here you would typically send the alert to all users via an API
+    setConfirmationMessage(`Alert sent to all users: "${alertMessage}"`);
+    setShowConfirmationModal(true);
+    setShowAlertModal(false);
+    setAlertMessage("");
+    setAlertError("");
+  };
+
+  const handleActivateEmergency = () => {
+    if (!emergencyMessage.trim()) {
+      setEmergencyError("Please write something before activating emergency mode");
+      return;
+    }
+    
+    // Here you would typically activate emergency mode via an API
+    setConfirmationMessage(`Emergency mode activated: "${emergencyMessage}"`);
+    setShowConfirmationModal(true);
+    setShowEmergencyModal(false);
+    setEmergencyMessage("");
+    setEmergencyError("");
+  };
+
+  const closeConfirmationModal = () => {
+    setShowConfirmationModal(false);
+  };
+
+  const handleAlertChange = (e) => {
+    setAlertMessage(e.target.value);
+    if (e.target.value.trim()) {
+      setAlertError("");
+    }
+  };
+
+  const handleEmergencyChange = (e) => {
+    setEmergencyMessage(e.target.value);
+    if (e.target.value.trim()) {
+      setEmergencyError("");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white p-4 md:p-6">
@@ -51,15 +186,28 @@ export default function AdminDashboard() {
                 <span>Police Command Center</span>
               </h1>
               <p className="text-gray-400 mt-2 text-sm md:text-base">
-                Welcome back, Commander. Real-time monitoring and analytics dashboard.
+                Welcome back, Commander. Real-time monitoring and analytics
+                dashboard.
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <button className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition">
+              <button
+                onClick={() => {
+                  setShowAlertModal(true);
+                  setAlertError("");
+                }}
+                className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition"
+              >
                 <Bell className="w-5 h-5" />
                 <span>Alerts</span>
               </button>
-              <button className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition">
+              <button
+                onClick={() => {
+                  setShowEmergencyModal(true);
+                  setEmergencyError("");
+                }}
+                className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition"
+              >
                 <Activity className="w-5 h-5" />
                 <span>Emergency Mode</span>
               </button>
@@ -67,29 +215,38 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        {/* Stats Cards */}
+        {/* Stats Cards with Links */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
           {stats.map((item, idx) => (
-            <motion.div
-              key={idx}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              className="bg-gray-800/80 hover:bg-gray-800 p-4 md:p-6 rounded-xl shadow-md border border-gray-700 backdrop-blur-sm transition"
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="bg-red-600/90 p-3 rounded-xl">
-                    {item.icon}
+            <Link key={idx} to={item.link}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.97 }}
+                className="bg-gray-800/80 hover:bg-gray-700 p-4 md:p-6 rounded-xl shadow-md border border-gray-700 backdrop-blur-sm transition cursor-pointer"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-red-600/90 p-3 rounded-xl">
+                      {item.icon}
+                    </div>
+                    <div>
+                      <h3 className="text-sm md:text-base font-medium text-gray-300">
+                        {item.title}
+                      </h3>
+                      <p className="text-2xl md:text-3xl font-bold text-white">
+                        {item.count}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm md:text-base font-medium text-gray-300">{item.title}</h3>
-                    <p className="text-2xl md:text-3xl font-bold text-white">{item.count}</p>
-                  </div>
+                  <span
+                    className={`text-xs font-semibold ${item.trendColor}`}
+                  >
+                    {item.trend}
+                  </span>
                 </div>
-                <span className={`text-xs font-semibold ${item.trendColor}`}>{item.trend}</span>
-              </div>
-              <p className="text-xs text-gray-400 mt-3">{item.description}</p>
-            </motion.div>
+                <p className="text-xs text-gray-400 mt-3">{item.description}</p>
+              </motion.div>
+            </Link>
           ))}
         </section>
 
@@ -236,6 +393,102 @@ export default function AdminDashboard() {
             </div>
           </motion.div>
         </section>
+
+        {/* Alerts Modal */}
+        {showAlertModal && (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+            <div className="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-xl relative">
+              <button
+                onClick={() => {
+                  setShowAlertModal(false);
+                  setAlertError("");
+                }}
+                className="absolute top-3 right-3 text-gray-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Bell className="w-5 h-5 text-red-400" /> Create Alert
+              </h2>
+              <textarea
+                rows="4"
+                placeholder="Enter alert details..."
+                className="w-full p-3 rounded-lg bg-gray-700 text-white outline-none"
+                value={alertMessage}
+                onChange={handleAlertChange}
+              />
+              {alertError && (
+                <p className="text-red-400 text-sm mt-2">{alertError}</p>
+              )}
+              <button 
+                onClick={handleSendAlert}
+                className="mt-4 w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg font-medium"
+              >
+                Send Alert to All Users
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Emergency Modal */}
+        {showEmergencyModal && (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+            <div className="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-xl relative">
+              <button
+                onClick={() => {
+                  setShowEmergencyModal(false);
+                  setEmergencyError("");
+                }}
+                className="absolute top-3 right-3 text-gray-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Activity className="w-5 h-5 text-red-500" /> Emergency Mode
+              </h2>
+              <textarea
+                rows="4"
+                placeholder="Enter emergency instructions..."
+                className="w-full p-3 rounded-lg bg-gray-700 text-white outline-none"
+                value={emergencyMessage}
+                onChange={handleEmergencyChange}
+              />
+              {emergencyError && (
+                <p className="text-red-400 text-sm mt-2">{emergencyError}</p>
+              )}
+              <button 
+                onClick={handleActivateEmergency}
+                className="mt-4 w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg font-medium"
+              >
+                Activate Emergency Mode
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Confirmation Modal */}
+        {showConfirmationModal && (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+            <div className="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-xl relative">
+              <button
+                onClick={closeConfirmationModal}
+                className="absolute top-3 right-3 text-gray-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-green-400">
+                <CheckCircle2 className="w-5 h-5" /> Success!
+              </h2>
+              <p className="text-white mb-4">{confirmationMessage}</p>
+              <button 
+                onClick={closeConfirmationModal}
+                className="w-full bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg font-medium"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Footer */}
         <footer className="text-center text-sm text-gray-500 pb-6">

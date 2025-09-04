@@ -1,8 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, LogIn, ShieldAlert, LayoutDashboard, Settings, ChartLine, MapPin, LogOut, Menu, ChevronLeft, UserCog, User, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-
+import React, { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Home,
+  LogIn,
+  ShieldAlert,
+  LayoutDashboard,
+  Settings,
+  ChartLine,
+  MapPin,
+  LogOut,
+  Menu,
+  ChevronLeft,
+  UserCog,
+  User,
+  X,
+  MessageSquare,
+  BarChart2,
+  Building2
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -60,8 +76,10 @@ export default function Sidebar() {
     { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
     { label: 'Complaints', path: '/admin/manage', icon: <UserCog className="w-5 h-5" /> },
     { label: 'Analytics', path: '/admin/analytics', icon: <ChartLine className="w-5 h-5" /> },
+    { label: 'Crime by City', path: '/crime-by-city', icon: <BarChart2 className="w-5 h-5" /> },
+    { label: 'Stations', path: '/admin/stations', icon: <Building2 className="w-5 h-5" /> },
     { label: 'User', path: '/User', icon: <User className="w-5 h-5" /> },
-    { label: 'Stations', path: '/admin/stations', icon: <MapPin className="w-5 h-5" /> },
+    { label: 'Feedback', path: '/feedback', icon: <MessageSquare className="w-5 h-5" /> },
     { label: 'Settings', path: '/admin/settings', icon: <Settings className="w-5 h-5" /> },
   ];
 
@@ -94,11 +112,10 @@ export default function Sidebar() {
               <Link
                 to={link.path}
                 onClick={() => handleLinkClick(link.path)}
-                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all ${
-                  location.pathname === link.path
-                    ? 'bg-red-900/50 text-white border border-red-800/50'
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                }`}
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all ${location.pathname === link.path
+                  ? 'bg-red-900/50 text-white border border-red-800/50'
+                  : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                  }`}
               >
                 <span className="mr-2">{link.icon}</span>
                 {!isCollapsed && <span>{link.label}</span>}
@@ -134,7 +151,7 @@ export default function Sidebar() {
               className="md:hidden fixed inset-0 bg-black z-40"
               onClick={() => setIsMobileOpen(false)}
             />
-            
+
             {/* Sidebar */}
             <motion.aside
               initial={{ x: -300 }}
@@ -161,11 +178,10 @@ export default function Sidebar() {
                     <Link
                       to={link.path}
                       onClick={() => handleLinkClick(link.path)}
-                      className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all ${
-                        location.pathname === link.path
-                          ? 'bg-red-900/50 text-white border border-red-800/50'
-                          : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                      }`}
+                      className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all ${location.pathname === link.path
+                        ? 'bg-red-900/50 text-white border border-red-800/50'
+                        : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                        }`}
                     >
                       <span className="mr-2">{link.icon}</span>
                       <span>{link.label}</span>
@@ -194,17 +210,17 @@ export default function Sidebar() {
       {/* Logout Modal */}
       <AnimatePresence>
         {showLogoutModal && (
-          <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            exit={{ opacity: 0 }} 
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
             onClick={cancelLogout}
           >
-            <motion.div 
-              initial={{ scale: 0.8, opacity: 0 }} 
-              animate={{ scale: 1, opacity: 1 }} 
-              exit={{ scale: 0.8, opacity: 0 }} 
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
               transition={{ type: "spring", damping: 20, stiffness: 300 }}
               className="bg-gray-800 rounded-xl p-6 w-full max-w-md text-center text-white border border-gray-700 shadow-xl"
               onClick={(e) => e.stopPropagation()}
@@ -214,10 +230,10 @@ export default function Sidebar() {
                   <LogOut className="w-8 h-8 text-red-400" />
                 </div>
               </div>
-              
+
               <h3 className="text-xl font-semibold mb-2">Confirm Logout</h3>
               <p className="text-gray-300 mb-6">Are you sure you want to logout from your account?</p>
-              
+
               <div className="flex gap-4 justify-center">
                 <button
                   onClick={cancelLogout}
